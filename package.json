@@ -1,0 +1,41 @@
+{
+  "name": "realtimebackend",
+  "version": "1.0.0",
+  "description": "for my realtime chat project",
+  "main": "MainApp/index.ts",
+  "scripts": {
+    "build": "concurrently \"rimraf MainApp\" \"npx tsc\"",
+    "start": "node MainApp/index.js",
+    "dev": "concurrently \"npx tsc -w\" \"nodemon MainApp/index.js\" "
+  },
+  "author": "marvellous obatale",
+  "license": "ISC",
+  "dependencies": {
+    "@auth/express": "^0.8.4",
+    "@auth/prisma-adapter": "^2.7.4",
+    "@prisma/client": "^6.2.1",
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/jsonwebtoken": "^9.0.8",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "prisma": "^6.2.1",
+    "rimraf": "^6.0.1",
+    "rmrf": "^2.0.4",
+    "ts-node": "^10.9.2",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.6",
+    "@types/node-cron": "^3.0.11",
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  }
+}

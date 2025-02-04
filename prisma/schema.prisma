@@ -1,0 +1,182 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+ 
+generator client {
+  provider = "prisma-client-js"
+}
+ 
+model User {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?         @unique
+  emailVerified Boolean?
+  image         String?
+  accounts      Account[]
+  password      String?
+  sessions      Session[]
+  profile       Profile?
+  messages      Message[]
+  conversations ConversationParticipant[]
+  createdGroups Group[]              @relation("GroupCreator")
+  friends       Friend[]             @relation("UserFriends")
+  friendsOf     Friend[]             @relation("UserFriend")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+}
+ 
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  refreshToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+}
+ 
+
+model Profile {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  bio       String?
+  firstName String?
+  lastName String?
+  nickname  String?
+  phoneNumber String?
+  gender        Gender @default(MALE)
+  birthDay DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profilePicture String?
+  userId    String   @db.ObjectId @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminOf   Group[]  @relation("GroupAdmin")
+  
+}
+
+model Message {
+  id        String   @id @default(cuid()) @map("_id")
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId         String       @db.ObjectId
+  user           User         @relation(fields: [userId], references: [id])
+  conversationId String       
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id        String   @id @default(cuid()) @map("_id")
+  type      ChatType @default(DIRECT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages    Message[]
+  participants ConversationParticipant[]
+}
+
+model ConversationParticipant {
+  id        String   @id @default(cuid()) @map("_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId         String       @db.ObjectId 
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String       
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  groupId        String?      
+  group          Group?       @relation(fields: [groupId], references: [id])
+
+  @@unique([userId, conversationId])
+}
+
+model Group {
+  id                   String               @id @default(cuid()) @map("_id")
+  name                 String
+  groupImage           String?
+  disappearingMessages DisappearingMessages @default(OFF)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  // Relations
+  creatorId String   @db.ObjectId
+  creator   User     @relation("GroupCreator", fields: [creatorId], references: [id])
+  adminId   String   @db.ObjectId
+  admin     Profile  @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  participants ConversationParticipant[]
+}
+
+model Friend {
+  id           String   @id @default(cuid()) @map("_id")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  userId       String   @db.ObjectId
+  user         User     @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
+  friendId     String   @db.ObjectId
+  friend       User     @relation("UserFriend", fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId])
+}
+
+enum DisappearingMessages {
+  OFF
+  DAYS90
+  DAYS7
+  H24
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHERS
+}
+
+enum ChatType {
+  DIRECT
+  GROUP
+}
+
+enum Role {
+  USER
+  ADMIN
+}
