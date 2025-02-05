@@ -12,10 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.domain = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const prisma_1 = require("../configs/prisma");
 const createSession_1 = require("./createSession");
 const client_1 = require("@prisma/client");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const isDevelopement = process.env.NODE_ENV === 'developement';
+exports.domain = isDevelopement ? 'localhost' : process.env.BASE_URL;
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstname, lastname, phoneNumber, email, password, gender, birthday } = req.body;
     const missingField = !firstname ? 'firstname' :
@@ -82,7 +87,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
-                domain: "localhost",
+                domain: exports.domain,
                 maxAge: 24 * 60 * 60 * 1000,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             });
