@@ -19,7 +19,7 @@ type RegisterUserRequest = {
 
 const isDevelopement = process.env.ENV === 'developement';
 
-export const domain = isDevelopement ? 'localhost' : "https://realtimebackend.onrender.com" ;
+export const domain = isDevelopement ? 'localhost' : "https://realtimebackend.onrender.com" as string;
 
 
 const registerUser: RequestHandler = async ( req: Request, res: Response) => {
@@ -106,7 +106,7 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
-                domain: domain,
+                domain: `${process.env.ENV}`,
                 maxAge: 24 * 60 * 60 * 1000, 
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             });
