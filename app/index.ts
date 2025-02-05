@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser'
 dotenv.config()
 
 const App: Express = express()
-const Port = process.env.PORT || 3030
+const Port = process.env.PORT 
 
 App.set("trust proxy", 1)
 App.use(express.json())
