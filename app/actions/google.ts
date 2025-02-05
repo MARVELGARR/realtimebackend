@@ -7,6 +7,7 @@ import {
 import crypto from "crypto";
 import { authConfig } from "../configs/auth.js";
 import { createOauthUser, OauthRespondsUser } from "./creatOauthUser.js";
+import { domain } from "./registerUser.js";
 
 // Store state tokens with expiry
 const stateStore = new Map<string, { timestamp: number }>();
@@ -131,7 +132,7 @@ export const googleCallback = async (
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        domain: "localhost",
+        domain: domain,
         maxAge: 24 * 60 * 60 * 1000, 
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });

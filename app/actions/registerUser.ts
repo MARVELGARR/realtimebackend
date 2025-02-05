@@ -3,7 +3,9 @@ import bcrypt from 'bcrypt';
 import { prisma } from '../configs/prisma';
 import { createSessionForUser } from './createSession';
 import { Gender } from '@prisma/client';
+import dotenv from 'dotenv';
 
+dotenv.config()
 
 type RegisterUserRequest = {
     firstname: string;
@@ -14,6 +16,10 @@ type RegisterUserRequest = {
     gender: Gender 
     birthday: string; 
 };
+
+const isDevelopement = process.env.NODE_ENV === 'developement';
+
+export const domain = isDevelopement ? 'localhost' : process.env.BASE_URL ;
 
 
 const registerUser: RequestHandler = async ( req: Request, res: Response) => {
@@ -100,7 +106,7 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
-                domain: "localhost",
+                domain: domain,
                 maxAge: 24 * 60 * 60 * 1000, 
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             });

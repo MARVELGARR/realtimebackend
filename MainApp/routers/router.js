@@ -7,10 +7,12 @@ const express_1 = require("express");
 const google_1 = require("../actions/google");
 const verifyToken_1 = require("../middleware/verifyToken");
 const registerUser_1 = __importDefault(require("../actions/registerUser"));
+const loginUser_1 = require("../actions/loginUser");
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = (0, express_1.Router)();
 router.get('/auth/google', google_1.googleAuth);
 router.get('/auth/callback/google', google_1.googleCallback);
 router.get('/user', verifyToken_1.authenticateToken, verifyToken_1.getUserData);
 router.post('/register', registerUser_1.default);
+router.post('/login', loginUser_1.loginUser);
 exports.default = router;
