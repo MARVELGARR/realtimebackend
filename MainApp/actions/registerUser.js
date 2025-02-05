@@ -20,7 +20,7 @@ const client_1 = require("@prisma/client");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const isDevelopement = process.env.NODE_ENV === 'developement';
-exports.domain = isDevelopement ? 'localhost' : process.env.BASE_URL;
+exports.domain = isDevelopement ? 'localhost' : "https://realtimebackend.onrender.com";
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstname, lastname, phoneNumber, email, password, gender, birthday } = req.body;
     const missingField = !firstname ? 'firstname' :
