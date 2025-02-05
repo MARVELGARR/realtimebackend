@@ -19,7 +19,7 @@ type RegisterUserRequest = {
 
 const isDevelopement = process.env.NODE_ENV === 'developement';
 
-export const domain = isDevelopement ? 'localhost' : process.env.BASE_URL ;
+export const domain = isDevelopement ? 'localhost' : "https://realtimebackend.onrender.com" ;
 
 
 const registerUser: RequestHandler = async ( req: Request, res: Response) => {
