@@ -94,25 +94,28 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
         })
         if(newUser){
            const sessionId = await createSessionForUser(newUser)
-           if(sessionId){
 
-                res.cookie('sessionID', sessionId?.sessionId, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: 'none',
-                    domain: "localhost",
-                    maxAge: 24 * 60 * 60 * 1000, 
-                    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                });
+
+            res.cookie('sessionID', sessionId?.sessionId, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                domain: "localhost",
+                maxAge: 24 * 60 * 60 * 1000, 
+                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            });
+    
         
-          
-              res.redirect(`${process.env.FRONTEND_URL}/App`);
+            res.status(200).json({
+                message: "User registered successfully",
+                sessionId: sessionId?.sessionId,
+            });
         
-               return 
-           }
+
         }
         else{
-            res.status(400).json({ message: 'Failed to create user' });
+            res.status(400).json({ message: "User registered successfully",
+                sessionId: null});
             return 
         }
 

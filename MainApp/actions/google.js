@@ -43,7 +43,7 @@ const googleAuth = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             scope: auth_js_1.authConfig.google.scopes.join(" "),
             access_type: "offline",
             state,
-            prompt: "consent",
+            prompt: "none",
         });
         const authUrl = `${auth_js_1.authConfig.google.authUrl}?${params.toString()}`;
         res.redirect(authUrl);

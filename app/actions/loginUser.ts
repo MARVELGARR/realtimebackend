@@ -1,0 +1,67 @@
+
+import { Response, Request, RequestHandler} from "express"
+import { prisma } from "../configs/prisma"
+import bcrypt from 'bcrypt';
+import { createSessionForUser } from "./createSession";
+
+type loginUserProp ={
+    email: string
+    password:string
+}
+
+export const loginUser: RequestHandler = async (req: Request, res: Response) => {
+
+    const {email, password}:loginUserProp = req.body
+
+    if(!email){
+        res.status(400).json({
+            error: "Email is required"
+        })
+    }
+    if (!password) {
+         res.status(400).json({ error: 'Password is required' });
+    }
+
+    try{
+        const user = await  prisma.user.findUnique({
+            where: {
+                email
+            }
+        })
+        if(!user){
+            res.status(404).json({
+                error: "You don't have an account"
+            })
+        }
+        const isPasswordValid = await bcrypt.compare(password, user?.password as string)
+        
+        if(!isPasswordValid){
+            res.status(401).json({
+                error: "Wrong Password"
+            })
+        }
+
+        const sessionID = await createSessionForUser(user!)
+
+        res.cookie('sessionID', sessionID?.sessionId, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            domain: "localhost",
+            maxAge: 24 * 60 * 60 * 1000, 
+            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        });
+
+        res.status(200).json({
+            message: "Login successful",
+            user: user,
+            sessionId: sessionID?.sessionId,
+        })
+
+    }
+    catch(error){
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+
+}

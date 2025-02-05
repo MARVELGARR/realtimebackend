@@ -78,21 +78,22 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
         if (newUser) {
             const sessionId = yield (0, createSession_1.createSessionForUser)(newUser);
-            if (sessionId) {
-                res.cookie('sessionID', sessionId === null || sessionId === void 0 ? void 0 : sessionId.sessionId, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: 'none',
-                    domain: "localhost",
-                    maxAge: 24 * 60 * 60 * 1000,
-                    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                });
-                res.redirect(`${process.env.FRONTEND_URL}/App`);
-                return;
-            }
+            res.cookie('sessionID', sessionId === null || sessionId === void 0 ? void 0 : sessionId.sessionId, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                domain: "localhost",
+                maxAge: 24 * 60 * 60 * 1000,
+                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            });
+            res.status(200).json({
+                message: "User registered successfully",
+                sessionId: sessionId === null || sessionId === void 0 ? void 0 : sessionId.sessionId,
+            });
         }
         else {
-            res.status(400).json({ message: 'Failed to create user' });
+            res.status(400).json({ message: "User registered successfully",
+                sessionId: null });
             return;
         }
     }
