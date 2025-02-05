@@ -17,7 +17,7 @@ type RegisterUserRequest = {
     birthday: string; 
 };
 
-const isDevelopement = process.env.NODE_ENV === 'developement';
+const isDevelopement = process.env.ENV === 'developement';
 
 export const domain = isDevelopement ? 'localhost' : "https://realtimebackend.onrender.com" ;
 
