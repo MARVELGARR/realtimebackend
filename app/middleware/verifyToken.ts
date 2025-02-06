@@ -44,8 +44,6 @@ export const authenticateToken : RequestHandler = async (
     next();
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
-            res.status(401).json({ error: 'Token has expired, please log in again' });
-        } else if (error instanceof jwt.JsonWebTokenError) {
             const session = await prisma.session.findUnique({
                 where: { id: sessionID },
               });
@@ -81,6 +79,9 @@ export const authenticateToken : RequestHandler = async (
             } catch (refreshError) {
                 return res.status(401).json({ error: 'Refresh token invalid, please log in again' });
             }
+            res.status(401).json({ error: 'Token has expired, please log in again' });
+        } else if (error instanceof jwt.JsonWebTokenError) {
+            res.status(400).json({message: 'token error'})
         } else {
             console.error("Token verification failed:", error);
             res.status(500).json({ error: 'Something went wrong with token verification' });
