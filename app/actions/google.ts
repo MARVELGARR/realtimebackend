@@ -7,7 +7,9 @@ import {
 import crypto from "crypto";
 import { authConfig } from "../configs/auth.js";
 import { createOauthUser, OauthRespondsUser } from "./creatOauthUser.js";
-import { domain } from "./registerUser.js";
+
+
+const domain = process.env.ENV 
 
 // Store state tokens with expiry
 const stateStore = new Map<string, { timestamp: number }>();
