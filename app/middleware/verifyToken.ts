@@ -35,6 +35,9 @@ export const authenticateToken : RequestHandler = async (
 
     // Optionally, you can validate JWT from the session
     const decoded = jwt.verify(session.sessionToken, process.env.JWT_SECRET!) as SessionPayload;
+
+
+
     console.log("Decoded token:", decoded);
 
     req.user  = decoded; // Attach user data to request object
@@ -43,7 +46,41 @@ export const authenticateToken : RequestHandler = async (
         if (error instanceof jwt.TokenExpiredError) {
             res.status(401).json({ error: 'Token has expired, please log in again' });
         } else if (error instanceof jwt.JsonWebTokenError) {
-            res.status(401).json({ error: 'Invalid token, please log in again' });
+            const session = await prisma.session.findUnique({
+                where: { id: sessionID },
+              });
+              if (!session) {
+                return res.status(401).json({ error: 'Session not found, please log in again' });
+            }
+        
+            const refreshToken = session.refreshToken;
+        
+            if (!refreshToken) {
+                return res.status(401).json({ error: 'No refresh token found, please log in again' });
+            }
+            try {
+                // Verify the refresh token
+                const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET!) as jwt.JwtPayload;
+                
+                // Generate a new access token
+                const newAccessToken = jwt.sign(
+                    { userId: decoded.userId, email: decoded.email },
+                    process.env.JWT_SECRET!,
+                    { expiresIn: '15m' }
+                );
+
+                res.cookie('sessionID', newAccessToken, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'none',
+                    maxAge: 24 * 60 * 60 * 1000, 
+                    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                  });
+        
+                  return res.status(200).json({ message: "Token refreshed successfully" });
+            } catch (refreshError) {
+                return res.status(401).json({ error: 'Refresh token invalid, please log in again' });
+            }
         } else {
             console.error("Token verification failed:", error);
             res.status(500).json({ error: 'Something went wrong with token verification' });

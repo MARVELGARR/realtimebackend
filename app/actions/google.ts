@@ -9,8 +9,6 @@ import { authConfig } from "../configs/auth.js";
 import { createOauthUser, OauthRespondsUser } from "./creatOauthUser.js";
 
 
-const domain = process.env.ENV 
-
 // Store state tokens with expiry
 const stateStore = new Map<string, { timestamp: number }>();
 
@@ -46,7 +44,7 @@ export const googleAuth: RequestHandler = async (
       scope: authConfig.google.scopes.join(" "),
       access_type: "offline",
       state,
-      prompt: "none",
+      prompt: "consent",
     });
 
     const authUrl = `${authConfig.google.authUrl}?${params.toString()}`;
