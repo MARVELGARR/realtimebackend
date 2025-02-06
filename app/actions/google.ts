@@ -44,7 +44,6 @@ export const googleAuth: RequestHandler = async (
       scope: authConfig.google.scopes.join(" "),
       access_type: "offline",
       state,
-      prompt: "consent",
     });
 
     const authUrl = `${authConfig.google.authUrl}?${params.toString()}`;
