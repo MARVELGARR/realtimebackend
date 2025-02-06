@@ -79,7 +79,7 @@ export const authenticateToken : RequestHandler = async (
             } catch (refreshError) {
                 return res.status(401).json({ error: 'Refresh token invalid, please log in again' });
             }
-            res.status(401).json({ error: 'Token has expired, please log in again' });
+            
         } else if (error instanceof jwt.JsonWebTokenError) {
             res.status(400).json({message: 'token error'})
         } else {
