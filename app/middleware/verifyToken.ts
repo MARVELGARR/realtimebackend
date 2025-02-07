@@ -77,7 +77,7 @@ export const authenticateToken : RequestHandler = async (
                 if(updatedSession){
 
 
-                    res.cookie('sessionID', updatedSession., {
+                    res.cookie('sessionID', updatedSession, {
                         httpOnly: true,
                         secure: true,
                         sameSite: 'none',
