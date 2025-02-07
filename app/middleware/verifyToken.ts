@@ -45,7 +45,7 @@ export const authenticateToken : RequestHandler = async (
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
             const session = await prisma.session.findUnique({
-                where: { sessionToken: sessionID },
+                where: { id: sessionID },
               });
               if (!session) {
                 return res.status(401).json({ error: 'Session not found, please log in again' });
@@ -67,15 +67,32 @@ export const authenticateToken : RequestHandler = async (
                     { expiresIn: '15m' }
                 );
 
-                res.cookie('sessionID', newAccessToken, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: 'none',
-                    maxAge: 24 * 60 * 60 * 1000, 
-                    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                  });
-        
-                  return res.status(200).json({ message: "Token refreshed successfully" });
+                const updatedSession = await prisma.session.update({
+                    where: { id: sessionID},
+                    data: {
+                        sessionToken: newAccessToken
+                    }
+                })
+
+                if(updatedSession){
+
+
+                    res.cookie('sessionID', updatedSession., {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'none',
+                        maxAge: 24 * 60 * 60 * 1000, 
+                        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    });
+                    
+                    res.status(200).json({ message: "Token refreshed successfully" });
+                }
+                else{
+                    
+                    res.status(200).json({ message: "Token refresh error" });
+                }
+
+
             } catch (refreshError) {
                 return res.status(401).json({ error: refreshError });
             }
