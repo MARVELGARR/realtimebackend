@@ -77,14 +77,14 @@ export const authenticateToken : RequestHandler = async (
         
                   return res.status(200).json({ message: "Token refreshed successfully" });
             } catch (refreshError) {
-                return res.status(401).json({ error: 'Refresh token invalid, please log in again' });
+                return res.status(401).json({ error: refreshError });
             }
             
         } else if (error instanceof jwt.JsonWebTokenError) {
             res.status(400).json({message: 'token error'})
         } else {
             console.error("Token verification failed:", error);
-            res.status(500).json({ error: 'Something went wrong with token verification' });
+            res.status(500).json({ error: error });
         }
     }
 };
