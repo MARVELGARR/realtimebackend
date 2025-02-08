@@ -17,9 +17,11 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
         res.status(400).json({
             error: "Email is required"
         })
+        return
     }
     if (!password) {
          res.status(400).json({ error: 'Password is required' });
+         return
     }
 
     try{
@@ -32,6 +34,7 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
             res.status(404).json({
                 error: "You don't have an account"
             })
+            return
         }
         const isPasswordValid = await bcrypt.compare(password, user?.password as string)
         
@@ -39,6 +42,7 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
             res.status(401).json({
                 error: "Wrong Password"
             })
+            return
         }
 
         const sessionID = await createSessionForUser(user!)
@@ -57,11 +61,13 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
             user: user,
             sessionId: sessionID?.sessionId,
         })
+        return
 
     }
     catch(error){
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });
+        return
     }
 
 }

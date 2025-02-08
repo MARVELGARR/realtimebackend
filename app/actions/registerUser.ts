@@ -41,16 +41,16 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
 
     switch (missingField) {
         case 'firstname':
-            res.status(400).json({ message: 'firstname is required' });
+            res.status(400).json({ error: 'firstname is required' });
             return 
         case 'lastname':
-            res.status(400).json({ message: 'lastname is required' });
+            res.status(400).json({ error: 'lastname is required' });
             return
         case 'phoneNumber':
-            res.status(400).json({ message: 'phoneNumber is required' });
+            res.status(400).json({ error: 'phoneNumber is required' });
             return 
         case 'email':
-            res.status(400).json({ message: 'email is required' });
+            res.status(400).json({ error: 'email is required' });
             return 
         default:
             break;
@@ -64,7 +64,7 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
         });
 
         if (existingUser) {
-            res.status(400).json({ message: 'email already exists' });
+            res.status(400).json({ error: 'email already exists' });
             return
         }
         
@@ -119,14 +119,14 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
 
         }
         else{
-            res.status(400).json({ message: "User registered successfully",
+            res.status(400).json({ error: "User not registered",
                 sessionId: null});
             return 
         }
 
     }
     catch(err){
-        res.status(500).json({ message: `Internal server error: ${err}` })
+        res.status(500).json({ error: `Internal server error: ${err}` })
         return
     }
 }

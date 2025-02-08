@@ -15,7 +15,7 @@ export const forgotPassword: RequestHandler = async (req: Request, res: Response
     // Don't reveal if user exists
     if (!user) {
        res.status(200).json({
-        message: 'If an account exists with this email, you will receive a password reset link'
+        error: 'If an account exists with this email, you will receive a password reset link'
       });
       return
     }

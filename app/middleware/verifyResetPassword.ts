@@ -13,7 +13,7 @@ declare global {
 
 dotenv.config();
 
-const verifyResetPassword: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+const verifyResetPassword: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     const { token } = req.query;
     const secret = process.env.JWT_SECRET!;
 
@@ -26,8 +26,10 @@ const verifyResetPassword: RequestHandler = (req: Request, res: Response, next: 
         const verify = jwt.verify(token, secret) as SessionPayload;
         req.passwordReset = verify;
         res.status(200).json({
-            message: "verification success"
+            message: "verification success",
+            token: `${token}`
         })
+        next()
     } catch (error) {
         console.error('Token verification error:', error);
          res.status(400).json({ error: 'Invalid or expired token' });
