@@ -25,7 +25,9 @@ const verifyResetPassword: RequestHandler = (req: Request, res: Response, next: 
     try {
         const verify = jwt.verify(token, secret) as SessionPayload;
         req.passwordReset = verify;
-        next();
+        res.status(200).json({
+            message: "verification success"
+        })
     } catch (error) {
         console.error('Token verification error:', error);
          res.status(400).json({ error: 'Invalid or expired token' });

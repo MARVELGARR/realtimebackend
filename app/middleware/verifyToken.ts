@@ -46,8 +46,8 @@ export const authenticateToken : RequestHandler = async (
         if (error instanceof jwt.TokenExpiredError) {
             const session = await prisma.session.findUnique({
                 where: { id: sessionID },
-              });
-              if (!session) {
+            });
+            if (!session) {
                 return res.status(401).json({ error: 'Session not found, please log in again' });
             }
         
@@ -77,7 +77,7 @@ export const authenticateToken : RequestHandler = async (
                 if(updatedSession){
 
 
-                    res.cookie('sessionID', updatedSession, {
+                    res.cookie('sessionID', updatedSession.id, {
                         httpOnly: true,
                         secure: true,
                         sameSite: 'none',

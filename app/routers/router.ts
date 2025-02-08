@@ -15,6 +15,7 @@ router.get('/user', authenticateToken, getUserData);
 router.post('/register', registerUser);
 router.post('/login', loginUser)
 router.post('/password-reset', forgotPassword)
-router.post('/reset-password', verifyResetPassword, resetPassword)
+router.get("/verifying-reset-password", authenticateToken,  verifyResetPassword)
+router.post('/reset-password', authenticateToken, resetPassword)
 
 export default router;

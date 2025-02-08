@@ -30,7 +30,7 @@ export const forgotPassword: RequestHandler = async (req: Request, res: Response
 
 
     // Create reset link
-    const resetLink = `${process.env.FRONTEND_URL}/resetingPassword?token=${resetToken}&userId=${user.id}`;
+    const resetLink = `${process.env.FRONTEND_URL}/resettingPassword?token=${resetToken}&userId=${user.id}`;
     const subject = "Password rest"
     // Send email
     await sendResetEmail(email, resetLink, subject);
