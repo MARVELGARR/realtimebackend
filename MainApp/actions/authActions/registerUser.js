@@ -12,15 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.domain = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const prisma_1 = require("../configs/prisma");
 const createSession_1 = require("./createSession");
 const client_1 = require("@prisma/client");
 const dotenv_1 = __importDefault(require("dotenv"));
+const prisma_1 = require("../../configs/prisma");
 dotenv_1.default.config();
-const isDevelopement = process.env.NODE_ENV === 'developement';
-exports.domain = isDevelopement ? 'localhost' : "https://realtimebackend.onrender.com";
+const domain = process.env.ENV;
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstname, lastname, phoneNumber, email, password, gender, birthday } = req.body;
     const missingField = !firstname ? 'firstname' :
@@ -29,16 +27,16 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 !email ? 'email' : null;
     switch (missingField) {
         case 'firstname':
-            res.status(400).json({ message: 'firstname is required' });
+            res.status(400).json({ error: 'firstname is required' });
             return;
         case 'lastname':
-            res.status(400).json({ message: 'lastname is required' });
+            res.status(400).json({ error: 'lastname is required' });
             return;
         case 'phoneNumber':
-            res.status(400).json({ message: 'phoneNumber is required' });
+            res.status(400).json({ error: 'phoneNumber is required' });
             return;
         case 'email':
-            res.status(400).json({ message: 'email is required' });
+            res.status(400).json({ error: 'email is required' });
             return;
         default:
             break;
@@ -49,7 +47,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             where: { email },
         });
         if (existingUser) {
-            res.status(400).json({ message: 'email already exists' });
+            res.status(400).json({ error: 'email already exists' });
             return;
         }
         const Genda = (genda) => {
@@ -87,7 +85,6 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
-                domain: exports.domain,
                 maxAge: 24 * 60 * 60 * 1000,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             });
@@ -97,13 +94,13 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             });
         }
         else {
-            res.status(400).json({ message: "User registered successfully",
+            res.status(400).json({ error: "User not registered",
                 sessionId: null });
             return;
         }
     }
     catch (err) {
-        res.status(500).json({ message: `Internal server error: ${err}` });
+        res.status(500).json({ error: `Internal server error: ${err}` });
         return;
     }
 });

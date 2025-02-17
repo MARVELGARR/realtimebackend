@@ -5,8 +5,8 @@ import {
   RequestParamHandler,
 } from "express";
 import crypto from "crypto";
-import { authConfig } from "../configs/auth.js";
 import { createOauthUser, OauthRespondsUser } from "./creatOauthUser.js";
+import { authConfig } from "../../configs/auth.js";
 
 
 // Store state tokens with expiry
@@ -136,7 +136,7 @@ export const googleCallback = async (
       });
 
   
-      res.redirect(`${process.env.FRONTEND_URL}/App`);
+      res.redirect(`${process.env.FRONTEND_URL}/App/chat`);
       
     } else {
       console.error("Failed to exchange authorization code");

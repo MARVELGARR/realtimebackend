@@ -25,6 +25,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 }
  
 model Account {
@@ -86,7 +87,9 @@ model Profile {
   userId    String   @db.ObjectId @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   adminOf   Group[]  @relation("GroupAdmin")
-  
+  blockedUsers  Block[]  @relation("Blocker")
+  blockedBy     Block[]  @relation("Blocked")
+  privacy Privacy?
 }
 
 model Message {
@@ -158,12 +161,51 @@ model Friend {
   @@unique([userId, friendId])
 }
 
+model Block {
+  id          String   @id @default(cuid()) @map("_id")
+  blockerId   String   @db.ObjectId
+  blockedId   String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  blocker     Profile  @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked     Profile  @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+}
+
+model Privacy {
+  id String @id @default(cuid()) @map("_id")
+  profileId String @db.ObjectId @unique
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  disappearingMessages DisappearingMessages @default(OFF)
+  lastSeen LastSeen @default(EVERYONE)
+  precense Precense @default(EVERYONE)
+
+  readReciept Boolean @default(false)
+
+}
+
 enum DisappearingMessages {
   OFF
   DAYS90
   DAYS7
   H24
 }
+
+enum LastSeen {
+  EVERYONE
+  MYCONTACTS
+  NOBODY
+}
+
+enum Precense {
+  EVERYONE
+  NOBODY
+}
+
 
 enum Gender {
   MALE

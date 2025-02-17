@@ -17,8 +17,9 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_1 = require("../configs/prisma");
 const authenticateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const sessionID = req.cookies.sessionID;
-    if (!sessionID) {
-        return res.status(401).json({ error: 'No session ID provided' });
+    if (!sessionID || sessionID === "null") {
+        res.status(401).json({ error: 'No session ID provided' });
+        return;
     }
     try {
         // Find the session in the database by session ID
@@ -26,7 +27,8 @@ const authenticateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, 
             where: { id: sessionID },
         });
         if (!session) {
-            return res.status(401).json({ error: 'Invalid session' });
+            res.status(401).json({ error: 'session dosent exist pls login again' });
+            return;
         }
         // Optionally, you can validate JWT from the session
         const decoded = jsonwebtoken_1.default.verify(session.sessionToken, process.env.JWT_SECRET);
@@ -36,14 +38,58 @@ const authenticateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     }
     catch (error) {
         if (error instanceof jsonwebtoken_1.default.TokenExpiredError) {
-            res.status(401).json({ error: 'Token has expired, please log in again' });
+            const session = yield prisma_1.prisma.session.findUnique({
+                where: { id: sessionID },
+            });
+            if (!session) {
+                res.status(401).json({ error: 'Session not found, please log in again' });
+                return;
+            }
+            const refreshToken = session.refreshToken;
+            if (!refreshToken) {
+                res.status(401).json({ error: 'No refresh token found, please log in again' });
+                return;
+            }
+            try {
+                // Verify the refresh token
+                const decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.JWT_SECRET);
+                // Generate a new access token
+                const newAccessToken = jsonwebtoken_1.default.sign({ userId: decoded.userId, email: decoded.email }, process.env.JWT_SECRET, { expiresIn: '15m' });
+                const updatedSession = yield prisma_1.prisma.session.update({
+                    where: { id: sessionID },
+                    data: {
+                        sessionToken: newAccessToken
+                    }
+                });
+                if (updatedSession) {
+                    res.cookie('sessionID', updatedSession.id, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'none',
+                        maxAge: 24 * 60 * 60 * 1000,
+                        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    });
+                    res.status(200).json({ message: "Token refreshed successfully" });
+                    return;
+                }
+                else {
+                    res.status(200).json({ error: "Token refresh error" });
+                    return;
+                }
+            }
+            catch (refreshError) {
+                res.status(401).json({ error: refreshError });
+                return;
+            }
         }
         else if (error instanceof jsonwebtoken_1.default.JsonWebTokenError) {
-            res.status(401).json({ error: 'Invalid token, please log in again' });
+            res.status(400).json({ error: 'token error' });
+            return;
         }
         else {
             console.error("Token verification failed:", error);
-            res.status(500).json({ error: 'Something went wrong with token verification' });
+            res.status(500).json({ error: error });
+            return;
         }
     }
 });
@@ -61,7 +107,11 @@ const getUserData = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
                 email: true,
                 name: true,
                 image: true,
-                profile: true,
+                profile: {
+                    include: {
+                        privacy: true
+                    }
+                },
             },
         });
         if (!user) {
@@ -79,7 +129,7 @@ const getUserData = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.getUserData = getUserData;
 const logout = (req, res) => {
-    res.clearCookie('token'); // Clear the session token cookie
+    res.clearCookie('sessionID');
     res.status(200).json({ message: 'Logged out successfully' });
 };
 exports.logout = logout;

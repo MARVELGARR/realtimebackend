@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createOauthUser = void 0;
-const auth_1 = require("../configs/auth");
-const prisma_1 = require("../configs/prisma");
 const createSession_1 = require("./createSession");
+const prisma_1 = require("../../configs/prisma");
+const auth_1 = require("../../configs/auth");
 const createOauthUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const existingUser = yield prisma_1.prisma.user.findUnique({
         where: { email: user.email },

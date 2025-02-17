@@ -13,18 +13,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginUser = void 0;
-const prisma_1 = require("../configs/prisma");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const createSession_1 = require("./createSession");
+const prisma_1 = require("../../configs/prisma");
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     if (!email) {
         res.status(400).json({
             error: "Email is required"
         });
+        return;
     }
     if (!password) {
         res.status(400).json({ error: 'Password is required' });
+        return;
     }
     try {
         const user = yield prisma_1.prisma.user.findUnique({
@@ -36,12 +38,14 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(404).json({
                 error: "You don't have an account"
             });
+            return;
         }
         const isPasswordValid = yield bcrypt_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
         if (!isPasswordValid) {
             res.status(401).json({
                 error: "Wrong Password"
             });
+            return;
         }
         const sessionID = yield (0, createSession_1.createSessionForUser)(user);
         res.cookie('sessionID', sessionID === null || sessionID === void 0 ? void 0 : sessionID.sessionId, {
@@ -57,10 +61,12 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             user: user,
             sessionId: sessionID === null || sessionID === void 0 ? void 0 : sessionID.sessionId,
         });
+        return;
     }
     catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });
+        return;
     }
 });
 exports.loginUser = loginUser;

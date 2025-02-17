@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-import { SessionPayload } from '../actions/createSession';
 import { prisma } from '../configs/prisma';
+import { SessionPayload } from '../actions/authActions/createSession';
 
 declare global {
     namespace Express {
@@ -19,8 +19,9 @@ export const authenticateToken : RequestHandler = async (
     const sessionID = req.cookies.sessionID;
 
 
-  if (!sessionID) {
-    return res.status(401).json({ error: 'No session ID provided' });
+  if (!sessionID || sessionID === "null") {
+     res.status(401).json({ error: 'No session ID provided' });
+     return
   }
 
   try {
@@ -30,7 +31,8 @@ export const authenticateToken : RequestHandler = async (
     });
 
     if (!session) {
-      return res.status(401).json({ error: 'Invalid session' });
+       res.status(401).json({ error: 'session dosent exist pls login again' });
+       return
     }
 
     // Optionally, you can validate JWT from the session
@@ -48,13 +50,15 @@ export const authenticateToken : RequestHandler = async (
                 where: { id: sessionID },
             });
             if (!session) {
-                return res.status(401).json({ error: 'Session not found, please log in again' });
+                 res.status(401).json({ error: 'Session not found, please log in again' });
+                 return 
             }
         
             const refreshToken = session.refreshToken;
         
             if (!refreshToken) {
-                return res.status(401).json({ error: 'No refresh token found, please log in again' });
+                 res.status(401).json({ error: 'No refresh token found, please log in again' });
+                 return
             }
             try {
                 // Verify the refresh token
@@ -86,22 +90,27 @@ export const authenticateToken : RequestHandler = async (
                     });
                     
                     res.status(200).json({ message: "Token refreshed successfully" });
+                    return
                 }
                 else{
                     
                     res.status(200).json({ error: "Token refresh error" });
+                    return
                 }
 
 
             } catch (refreshError) {
-                return res.status(401).json({ error: refreshError });
+                res.status(401).json({ error: refreshError });
+                return 
             }
             
         } else if (error instanceof jwt.JsonWebTokenError) {
             res.status(400).json({error: 'token error'})
+            return
         } else {
             console.error("Token verification failed:", error);
             res.status(500).json({ error: error });
+            return
         }
     }
 };
@@ -121,7 +130,12 @@ export const getUserData: RequestHandler = async (req: Request, res: Response, n
                 email: true,
                 name: true,
                 image: true,
-                profile: true,
+                profile: {
+                    include: {
+                        privacy: true
+                    }
+                },
+                
                 
             },
         });
@@ -141,7 +155,7 @@ export const getUserData: RequestHandler = async (req: Request, res: Response, n
 };
 
 export const logout = (req: Request, res: Response) => {
-    res.clearCookie('token'); // Clear the session token cookie
+    res.clearCookie('sessionID');
     res.status(200).json({ message: 'Logged out successfully' });
 };
   

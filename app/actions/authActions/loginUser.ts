@@ -1,8 +1,8 @@
 
 import { Response, Request, RequestHandler} from "express"
-import { prisma } from "../configs/prisma"
 import bcrypt from 'bcrypt';
 import { createSessionForUser } from "./createSession";
+import { prisma } from "../../configs/prisma";
 
 type loginUserProp ={
     email: string

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { prisma } from '../configs/prisma';
 import { User } from '@prisma/client';
+import { prisma } from '../../configs/prisma';
 
 export interface SessionPayload {
   userId: string;

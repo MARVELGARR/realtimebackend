@@ -1,9 +1,9 @@
 import { Request, RequestHandler, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { prisma } from '../configs/prisma';
 import { createSessionForUser } from './createSession';
 import { Gender } from '@prisma/client';
 import dotenv from 'dotenv';
+import { prisma } from '../../configs/prisma';
 
 dotenv.config()
 

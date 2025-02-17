@@ -1,7 +1,7 @@
 import { Gender } from "@prisma/client";
-import { scopes } from "../configs/auth";
-import { prisma } from "../configs/prisma";
 import { createSessionForUser } from "./createSession";
+import { prisma } from "../../configs/prisma";
+import { scopes } from "../../configs/auth";
 
 export interface OauthRespondsUser {
     id: string;

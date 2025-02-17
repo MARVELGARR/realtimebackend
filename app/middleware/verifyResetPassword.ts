@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction, RequestParamHandler, RequestHandler } from "express";
 import dotenv from "dotenv";
 import jwt from 'jsonwebtoken';
-import { SessionPayload } from "../actions/createSession";
+import { SessionPayload } from "../actions/authActions/createSession";
 
 declare global {
     namespace Express {

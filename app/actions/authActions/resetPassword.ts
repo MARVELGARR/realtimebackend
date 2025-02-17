@@ -3,7 +3,7 @@ import { prisma } from "../../configs/prisma";
 import bcrypt from 'bcrypt';
 import dotenv from "dotenv";
 import jwt from 'jsonwebtoken';
-import { SessionPayload } from "../createSession";
+import { SessionPayload } from "./createSession";
 
 dotenv.config();
 
@@ -33,8 +33,10 @@ const resetPassword: RequestHandler = async (req: Request, res: Response) => {
 
         if (updateUser) {
              res.status(200).json({ message: "Password changed successfully" });
+             return
         } else {
              res.status(500).json({ error: "Error changing password" });
+             return
         }
     } catch (error) {
         console.error('Error resetting password:', error);

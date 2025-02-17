@@ -14,9 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.googleCallback = exports.googleAuth = void 0;
 const crypto_1 = __importDefault(require("crypto"));
-const auth_js_1 = require("../configs/auth.js");
 const creatOauthUser_js_1 = require("./creatOauthUser.js");
-const registerUser_js_1 = require("./registerUser.js");
+const auth_js_1 = require("../../configs/auth.js");
 // Store state tokens with expiry
 const stateStore = new Map();
 const cleanupStates = () => {
@@ -44,7 +43,6 @@ const googleAuth = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             scope: auth_js_1.authConfig.google.scopes.join(" "),
             access_type: "offline",
             state,
-            prompt: "none",
         });
         const authUrl = `${auth_js_1.authConfig.google.authUrl}?${params.toString()}`;
         res.redirect(authUrl);
@@ -108,11 +106,10 @@ const googleCallback = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
-                domain: registerUser_js_1.domain,
                 maxAge: 24 * 60 * 60 * 1000,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             });
-            res.redirect(`${process.env.FRONTEND_URL}/App`);
+            res.redirect(`${process.env.FRONTEND_URL}/App/chat`);
         }
         else {
             console.error("Failed to exchange authorization code");

@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createSessionForUser = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const prisma_1 = require("../configs/prisma");
+const prisma_1 = require("../../configs/prisma");
 const createSessionForUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = {
         userId: user.id,
