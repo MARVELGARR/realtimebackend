@@ -16,8 +16,7 @@ export const authenticateToken : RequestHandler = async (
     res: Response, 
     next: NextFunction
 ): Promise<any> => {
-    const sessionID = req.cookies.sessionData;
-
+    const sessionID = req.cookies.sessionID;
 
   if (!sessionID || sessionID === "null") {
      res.status(401).json({ error: 'No session ID provided' });

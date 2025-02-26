@@ -16,7 +16,7 @@ exports.logout = exports.getUserData = exports.authenticateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_1 = require("../configs/prisma");
 const authenticateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const sessionID = req.cookies.sessionData;
+    const sessionID = req.cookies.sessionID;
     if (!sessionID || sessionID === "null") {
         res.status(401).json({ error: 'No session ID provided' });
         return;
