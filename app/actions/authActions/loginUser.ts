@@ -28,7 +28,7 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
         const user = await  prisma.user.findUnique({
             where: {
                 email
-            }
+            },
         })
         if(!user){
             res.status(404).json({
@@ -47,7 +47,9 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
 
         const sessionID = await createSessionForUser(user!)
 
-        res.cookie('sessionID', sessionID?.sessionId, {
+     
+
+        res.cookie('sessionID', sessionID.sessionId, {
             httpOnly: true,
             secure: true,
             sameSite: 'none',

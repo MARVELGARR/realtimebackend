@@ -32,7 +32,7 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield prisma_1.prisma.user.findUnique({
             where: {
                 email
-            }
+            },
         });
         if (!user) {
             res.status(404).json({
@@ -48,7 +48,7 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         const sessionID = yield (0, createSession_1.createSessionForUser)(user);
-        res.cookie('sessionID', sessionID === null || sessionID === void 0 ? void 0 : sessionID.sessionId, {
+        res.cookie('sessionID', sessionID.sessionId, {
             httpOnly: true,
             secure: true,
             sameSite: 'none',

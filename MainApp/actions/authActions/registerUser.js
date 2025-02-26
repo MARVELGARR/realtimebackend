@@ -81,7 +81,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
         if (newUser) {
             const sessionId = yield (0, createSession_1.createSessionForUser)(newUser);
-            res.cookie('sessionID', sessionId === null || sessionId === void 0 ? void 0 : sessionId.sessionId, {
+            res.cookie('sessionID', sessionId, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',

@@ -16,7 +16,7 @@ export const authenticateToken : RequestHandler = async (
     res: Response, 
     next: NextFunction
 ): Promise<any> => {
-    const sessionID = req.cookies.sessionID;
+    const sessionID = req.cookies.sessionData;
 
 
   if (!sessionID || sessionID === "null") {
@@ -25,7 +25,8 @@ export const authenticateToken : RequestHandler = async (
   }
 
   try {
-    // Find the session in the database by session ID
+    // Find the session in the database by 
+    // session ID
     const session = await prisma.session.findUnique({
       where: { id: sessionID },
     });
@@ -81,16 +82,16 @@ export const authenticateToken : RequestHandler = async (
                 if(updatedSession){
 
 
-                    res.cookie('sessionID', updatedSession.id, {
+                    res.cookie('sessionData', updatedSession.id), {
                         httpOnly: true,
                         secure: true,
                         sameSite: 'none',
-                        maxAge: 24 * 60 * 60 * 1000, 
+                        maxAge: 24 * 60 * 60 * 1000,
                         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                    });
-                    
+                    };
+
                     res.status(200).json({ message: "Token refreshed successfully" });
-                    return
+                    return;
                 }
                 else{
                     

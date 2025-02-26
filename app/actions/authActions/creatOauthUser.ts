@@ -1,6 +1,6 @@
-import { Gender } from "@prisma/client";
+import { Gender, Prisma } from "@prisma/client";
 import { createSessionForUser } from "./createSession";
-import { prisma } from "../../configs/prisma";
+import { prisma } from '../../configs/prisma';
 import { scopes } from "../../configs/auth";
 
 export interface OauthRespondsUser {
@@ -18,10 +18,12 @@ export interface OauthRespondsUser {
     birthDay?: Date
     phoneNumber?: string
 }
+export type NewOauthUserType = Prisma.UserGetPayload<{ include: { profile: { select: { phoneNumber: true, profilePicture: true, privacy: { select: { readReciept: true, disappearingMessages: true, precense: true } } } } } }>
 
 export const createOauthUser = async (user: OauthRespondsUser) => {
     const existingUser = await prisma.user.findUnique({
         where: { email: user.email },
+
     });
   
     if (existingUser) {
@@ -60,8 +62,10 @@ export const createOauthUser = async (user: OauthRespondsUser) => {
                     expires_at: null,
                 }]
             }
-        }
-    });
+        },
+    }) 
+
+    
 
     if(newUser){
         return await createSessionForUser(newUser);

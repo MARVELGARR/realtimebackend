@@ -16,13 +16,14 @@ exports.logout = exports.getUserData = exports.authenticateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_1 = require("../configs/prisma");
 const authenticateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const sessionID = req.cookies.sessionID;
+    const sessionID = req.cookies.sessionData;
     if (!sessionID || sessionID === "null") {
         res.status(401).json({ error: 'No session ID provided' });
         return;
     }
     try {
-        // Find the session in the database by session ID
+        // Find the session in the database by 
+        // session ID
         const session = yield prisma_1.prisma.session.findUnique({
             where: { id: sessionID },
         });
@@ -62,13 +63,13 @@ const authenticateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, 
                     }
                 });
                 if (updatedSession) {
-                    res.cookie('sessionID', updatedSession.id, {
+                    res.cookie('sessionData', updatedSession.id), {
                         httpOnly: true,
                         secure: true,
                         sameSite: 'none',
                         maxAge: 24 * 60 * 60 * 1000,
                         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                    });
+                    };
                     res.status(200).json({ message: "Token refreshed successfully" });
                     return;
                 }

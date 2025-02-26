@@ -4,6 +4,7 @@ import { createSessionForUser } from './createSession';
 import { Gender } from '@prisma/client';
 import dotenv from 'dotenv';
 import { prisma } from '../../configs/prisma';
+import { read } from 'fs';
 
 dotenv.config()
 
@@ -100,29 +101,30 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
         })
         if(newUser){
            const sessionId = await createSessionForUser(newUser)
+            
 
-
-            res.cookie('sessionID', sessionId?.sessionId, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'none',
-                maxAge: 24 * 60 * 60 * 1000, 
-                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-            });
-    
-        
-            res.status(200).json({
-                message: "User registered successfully",
-                sessionId: sessionId?.sessionId,
-            });
-        
-
+           res.cookie('sessionID', sessionId, {
+               httpOnly: true,
+               secure: true,
+               sameSite: 'none',
+               maxAge: 24 * 60 * 60 * 1000, 
+               expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+           });
+   
+       
+           res.status(200).json({
+               message: "User registered successfully",
+               sessionId: sessionId?.sessionId,
+           });
         }
         else{
             res.status(400).json({ error: "User not registered",
                 sessionId: null});
             return 
         }
+        
+
+        
 
     }
     catch(err){

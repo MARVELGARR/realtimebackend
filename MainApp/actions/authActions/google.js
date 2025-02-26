@@ -100,16 +100,17 @@ const googleCallback = (req, res) => __awaiter(void 0, void 0, void 0, function*
             const userWithTokens = Object.assign(Object.assign({}, userData), { access_token: tokens.access_token, refresh_token: tokens.refresh_token, id_token: tokens.id_token });
             console.log("user from oAuth", userWithTokens);
             // Create or update the user and get session
-            const sessionID = yield (0, creatOauthUser_js_1.createOauthUser)(userWithTokens);
+            const { sessionId } = (yield (0, creatOauthUser_js_1.createOauthUser)(userWithTokens)) || {};
+            ;
             // Set session in HTTP-only cookie
-            res.cookie('sessionID', sessionID === null || sessionID === void 0 ? void 0 : sessionID.sessionId, {
+            res.cookie('sessionID', sessionId, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
                 maxAge: 24 * 60 * 60 * 1000,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             });
-            res.redirect(`${process.env.FRONTEND_URL}/App/chat`);
+            res.redirect(`${process.env.FRONTEND_URL}/App`);
         }
         else {
             console.error("Failed to exchange authorization code");

@@ -51,7 +51,7 @@ const createOauthUser = (user) => __awaiter(void 0, void 0, void 0, function* ()
                         expires_at: null,
                     }]
             }
-        }
+        },
     });
     if (newUser) {
         return yield (0, createSession_1.createSessionForUser)(newUser);

@@ -10,6 +10,11 @@ import { googleAuth, googleCallback } from '../actions/authActions/google';
 import registerUser from '../actions/authActions/registerUser';
 import { loginUser } from '../actions/authActions/loginUser';
 import updateUserPrivacy from '../actions/userManagementActions/updateUserPrivacy';
+import clearAllChats from '../actions/userManagementActions/clearAllChat';
+import { getAndFilterChats } from '../actions/userManagementActions/getAndFilterChats';
+import sendMessage from '../actions/messageActions/sendMessage';
+import deleteMessage from '../actions/messageActions/deleteMessage';
+import getConversationWithrecepientId from '../actions/messageActions/getConversationWithrecepientId';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -26,8 +31,19 @@ router.get("/verifying-reset-password", verifyResetPassword)
 router.post('/reset-password', resetPassword)
 
 
+
 // user management routes
 router.patch('/update-profile', authenticateToken, updateProfile)
 router.patch("/update-user-privacy:currentProfileId", authenticateToken, updateUserPrivacy)
+router.get('/clear-all-message/:userId', authenticateToken, clearAllChats);
+router.get('/search', authenticateToken, getAndFilterChats)
+
+
+
+//message & conversation routes   
+router.post('/send-message:conversationId', authenticateToken, sendMessage)
+router.delete('/delete-message/:messageId', authenticateToken, deleteMessage)
+router.patch('/update-message/:messageId', authenticateToken)
+router.get( `/conversation-recepientId`,authenticateToken, getConversationWithrecepientId)
 
 export default router;

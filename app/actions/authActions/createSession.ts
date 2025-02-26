@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User } from '@prisma/client';
 import { prisma } from '../../configs/prisma';
+import { NewOauthUserType } from './creatOauthUser';
 
 export interface SessionPayload {
   userId: string;
@@ -8,7 +9,7 @@ export interface SessionPayload {
   name: string | null;
 }
 
-export const createSessionForUser = async (user: User) => {
+export const createSessionForUser = async (user: any) => {
   const payload: SessionPayload = {
     userId: user.id,
     email: user.email,
@@ -49,3 +50,4 @@ export const createSessionForUser = async (user: User) => {
     throw new Error('Failed to create session'); // Throw an error instead of returning an error object
   }
 };
+
