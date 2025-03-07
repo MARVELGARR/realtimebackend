@@ -89,8 +89,6 @@ export const authenticateToken : RequestHandler = async (
                         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
                     };
 
-                    res.status(200).json({ message: "Token refreshed successfully" });
-                    return;
                 }
                 else{
                     

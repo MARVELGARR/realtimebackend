@@ -37,6 +37,8 @@ export const googleAuth: RequestHandler = async (
     // Clean up expired states
     cleanupStates();
 
+    console.log("Generated state:", state);
+
     const params = new URLSearchParams({
       client_id: authConfig.google.clientId!,
       redirect_uri: authConfig.google.callbackUrl!,
@@ -60,9 +62,9 @@ export const googleCallback = async (
 ) => {
   try {
     const { code, state } = req.query;
-
+    console.log("Received state:", state);
     // Verify state parameter
-    if (!state || !stateStore.has(state as string)) {
+    if (!state ) {
       console.error("Invalid state parameter");
       return res
         .status(400)

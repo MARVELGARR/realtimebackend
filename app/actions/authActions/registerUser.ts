@@ -97,8 +97,30 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
     
                     }
                 }
+            },
+            include: {
+                profile: {
+                    select: {
+                        bio: true,
+                        birthDay: true,
+                        nickname: true,
+                        phoneNumber: true,
+                        gender: true,
+                        profilePicture: true,
+                        privacy: {
+                            select: {
+                                disappearingMessages: true,
+                                lastSeen: true,
+                                precense: true,
+                                readReciept: true,
+                                
+                            }
+                        }
+                    }
+                }
             }
         })
+
         if(newUser){
            const sessionId = await createSessionForUser(newUser)
             

@@ -29,6 +29,28 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
             where: {
                 email
             },
+            include: {
+                profile: {
+                    select: {
+                        bio: true,
+                        birthDay: true,
+                        nickname: true,
+                        phoneNumber: true,
+                        gender: true,
+                        profilePicture: true,
+                        privacy: {
+                            select: {
+                                disappearingMessages: true,
+                                lastSeen: true,
+                                precense: true,
+                                readReciept: true,
+                                
+                            }
+                        }
+                    }
+                }
+            }
+
         })
         if(!user){
             res.status(404).json({

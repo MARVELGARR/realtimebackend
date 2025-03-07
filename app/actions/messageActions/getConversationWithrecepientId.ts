@@ -30,9 +30,20 @@ const getConversationWithrecepientId: RequestHandler = async( req: Request, res:
                         user: true
                     }
                 },
-                participants: {
-                    distinct: ['userId']
-                }
+                participants: { 
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                image: true,
+                                name: true,
+                                profile: true
+                            }
+                        }
+                    },
+                    distinct: ['userId'],
+                },
+            
             }
         })
         if(conversation){

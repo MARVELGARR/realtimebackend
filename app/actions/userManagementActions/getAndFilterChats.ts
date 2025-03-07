@@ -21,7 +21,7 @@ export const getAndFilterChats: RequestHandler = async (
 
   try {
     // If no search term, return recent conversations
-    if (!searchTerm) {
+    if (!searchTerm || searchTerm === '') {
       const conversations = await prisma.conversation.findMany({
         orderBy: {
           updatedAt: "desc",
@@ -118,6 +118,7 @@ export const getAndFilterChats: RequestHandler = async (
               blockedBy: true,
             },
           },
+
         },
         take: limit,
         skip: skip,
