@@ -19,7 +19,7 @@ const logout: RequestHandler = async (req: Request, res: Response) => {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
-                domain: "localhost"
+                
             });
 
              res.status(200).json({ message: "Logout successful" });
