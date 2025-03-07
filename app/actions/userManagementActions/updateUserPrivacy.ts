@@ -38,7 +38,7 @@ const updateUserPrivacy: RequestHandler = async (req: Request, res: Response) =>
           profileId: currentProfileId,
           disappearingMessages: parsedData.disappearing,
           lastSeen: parsedData.lastSeen,
-          precense: parsedData.online,
+          precense: parsedData.online, 
           readReciept: parsedData.readreceipt,
         },
       });
