@@ -1,7 +1,6 @@
 import { Request, RequestHandler, Response } from "express";
 import { z } from "zod";
 import { prisma } from "../../configs/prisma";
-import { LastSeen, Precense } from "@prisma/client";
 
 const FormSchema = z.object({
   lastSeen: z.enum(["EVERYONE", "MYCONTACTS", "NOBODY"]).optional(),
