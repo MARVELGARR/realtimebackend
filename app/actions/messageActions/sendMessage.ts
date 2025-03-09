@@ -25,6 +25,7 @@ const sendMessage = async (req: Request, res: Response) => {
     const parsedData = formSchema.parse({ message, reciepientId });
 
     let newMessage;
+    const editExpire = new Date(new Date().getTime() + 20 * 60000);
     if (conversationId && conversationId !== "undefined") {
       // If conversationId is provided, connect to the existing conversation
       newMessage = await prisma.message.create({
@@ -35,6 +36,7 @@ const sendMessage = async (req: Request, res: Response) => {
               id: user.userId
             }
           },
+          editableUntil: editExpire,
           conversation: {
             connect: {
               id: conversationId
@@ -55,6 +57,7 @@ const sendMessage = async (req: Request, res: Response) => {
               id: user.userId
             }
           },
+          editableUntil: editExpire,
           conversation: {
             create: {
               type: "DIRECT",

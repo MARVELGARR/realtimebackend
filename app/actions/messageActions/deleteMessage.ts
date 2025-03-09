@@ -17,7 +17,7 @@ const deleteMessage: RequestHandler = async(req:Request, res: Response) => {
             res.status(200).json({ message: 'Message deleted successfully' });
             return
         } else {
-            res.status(500).json({ error: 'Failed to delete message' });
+            res.status(404).json({ error: 'message not found ' });
             return
         }
     }

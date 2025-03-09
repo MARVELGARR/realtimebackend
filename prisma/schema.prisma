@@ -25,6 +25,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  
 }
 
 model Account {
@@ -88,10 +90,12 @@ model Profile {
   blockedUsers  Block[]  @relation("Blocker")
   blockedBy     Block[]  @relation("Blocked")
   privacy Privacy?
+
+  StarredMessage StarredMessage[]
 }
 
 model Message {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId 
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -101,6 +105,21 @@ model Message {
   user           User         @relation(fields: [userId], references: [id])
   conversationId String       @db.ObjectId 
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  editableUntil DateTime  
+
+  StarredMessage StarredMessage[]
+}
+
+model StarredMessage {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileId     String   @db.ObjectId
+  profile       Profile     @relation(fields: [profileId], references: [id])
+  messageId  String   @db.ObjectId
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@unique([profileId, messageId]) // Ensures a user can only star a message once
 }
 
 model Conversation {
@@ -128,6 +147,8 @@ model ConversationParticipant {
 
   @@unique([userId, conversationId])
 }
+
+
 
 model Group {
  id            String          @id @default(auto()) @map("_id") @db.ObjectId
