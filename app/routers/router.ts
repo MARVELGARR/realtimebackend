@@ -15,6 +15,7 @@ import { getAndFilterChats } from '../actions/userManagementActions/getAndFilter
 import sendMessage from '../actions/messageActions/sendMessage';
 import deleteMessage from '../actions/messageActions/deleteMessage';
 import getConversationWithrecepientId from '../actions/messageActions/getConversationWithrecepientId';
+import getSearchUsers from '../actions/userManagementActions/getSearchUsers';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -37,6 +38,7 @@ router.patch('/update-profile', authenticateToken, updateProfile)
 router.patch("/update-user-privacy:currentProfileId", authenticateToken, updateUserPrivacy)
 router.get('/clear-all-message/:userId', authenticateToken, clearAllChats);
 router.get('/search', authenticateToken, getAndFilterChats)
+router.get('/searchUsers', authenticateToken, getSearchUsers)
 
 
 
