@@ -7,6 +7,9 @@ export interface SessionPayload {
   userId: string;
   email: string | null;
   name: string | null;
+  profile: {
+    id: string | null
+  }| null
 }
 
 export const createSessionForUser = async (user: any) => {
@@ -14,6 +17,7 @@ export const createSessionForUser = async (user: any) => {
     userId: user.id,
     email: user.email,
     name: user.name,
+    profile: user.profile.id
   }
   const token = jwt.sign(
     payload,

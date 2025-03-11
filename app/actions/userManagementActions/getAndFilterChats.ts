@@ -47,6 +47,15 @@ export const getAndFilterChats: RequestHandler = async (
                       firstName: true,
                       lastName: true,
                       profilePicture: true,
+                      blockedUsers: {
+                        include: {
+                          blocked: {
+                            select: {
+                              id: true
+                            }
+                          }
+                        }
+                      }
                     },
                   },
                 },
@@ -80,7 +89,7 @@ export const getAndFilterChats: RequestHandler = async (
       });
 
       const total = await prisma.conversation.count();
-      const directConversations = conversations.filter((convo)=>convo.participants.length === 2)
+      const directConversations = conversations.filter((convo)=>convo.participants.filter((item)=>item.user.profile?.blockedUsers.some((profile)=>profile.blockerId !== user.profile?.id))) .filter((convo)=>convo.participants.length === 2)
 
       const groupConversations = conversations.filter((convo)=>convo.participants.length > 2).map((group)=>group.group)
       

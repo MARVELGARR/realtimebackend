@@ -23,6 +23,13 @@ export type NewOauthUserType = Prisma.UserGetPayload<{ include: { profile: { sel
 export const createOauthUser = async (user: OauthRespondsUser) => {
     const existingUser = await prisma.user.findUnique({
         where: { email: user.email },
+        include: {
+            profile: {
+                select: {
+                    id: true
+                }
+            }
+        }
 
     });
   

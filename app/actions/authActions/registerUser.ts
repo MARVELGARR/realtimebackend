@@ -101,6 +101,7 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
             include: {
                 profile: {
                     select: {
+                        id: true,
                         bio: true,
                         birthDay: true,
                         nickname: true,
