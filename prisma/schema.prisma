@@ -99,6 +99,7 @@ model Message {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  type      ChatType @default(DIRECT)
 
   // Relations
   userId         String       @db.ObjectId
@@ -124,12 +125,14 @@ model StarredMessage {
 
 model Conversation {
  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  type      ChatType @default(DIRECT)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
   messages    Message[]
   participants ConversationParticipant[]
+  groupId        String?      @db.ObjectId
+  group          Group?       @relation(fields: [groupId], references: [id])
 }
 
 model ConversationParticipant {
@@ -165,6 +168,8 @@ model Group {
   adminId   String   @db.ObjectId
   admin     Profile  @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: Cascade)
   participants ConversationParticipant[]
+
+  Conversation Conversation[]
 }
 
 model Friend {
