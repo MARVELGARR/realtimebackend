@@ -20,13 +20,14 @@ model User {
   messages      Message[]
   conversations ConversationParticipant[]
   createdGroups Group[]              @relation("GroupCreator")
-  friends       Friend[]             @relation("UserFriends")
-  friendsOf     Friend[]             @relation("UserFriend")
+  friends       Friend[]             
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   
+
+  StarConversation StarConversation[]
 }
 
 model Account {
@@ -92,6 +93,7 @@ model Profile {
   privacy Privacy?
 
   StarredMessage StarredMessage[]
+
 }
 
 model Message {
@@ -119,6 +121,7 @@ model StarredMessage {
   message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   createdAt  DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   @@unique([profileId, messageId]) // Ensures a user can only star a message once
 }
@@ -133,6 +136,18 @@ model Conversation {
   participants ConversationParticipant[]
   groupId        String?      @db.ObjectId
   group          Group?       @relation(fields: [groupId], references: [id])
+
+  StarConversation StarConversation[]
+}
+
+model StarConversation {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+   userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id])
+  conversationId  String   @db.ObjectId
+  conversation    Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model ConversationParticipant {
@@ -180,11 +195,10 @@ model Friend {
 
   // Relations
   userId       String   @db.ObjectId
-  user         User     @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
-  friendId     String   @db.ObjectId
-  friend       User     @relation("UserFriend", fields: [friendId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, friendId])
+
+  @@unique([userId])
 }
 
 model Block {

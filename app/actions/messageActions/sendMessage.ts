@@ -60,7 +60,6 @@ const sendMessage = async (req: Request, res: Response) => {
           editableUntil: editExpire,
           conversation: {
             create: {
-              type: "DIRECT",
               participants: {
                 create: [
                   { userId: user.userId },

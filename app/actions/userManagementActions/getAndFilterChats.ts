@@ -14,6 +14,11 @@ export const getAndFilterChats: RequestHandler = async (
   req: Request,
   res: Response
 ) => {
+  const user = req.user;
+  if (!user) {
+    res.status(400).json({ error: "User not authenticated" });
+    return;
+  }
   const searchTerm = req.query.searchTerm as string;
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
@@ -35,6 +40,7 @@ export const getAndFilterChats: RequestHandler = async (
                   name: true,
                   email: true,
                   image: true,
+                  friends: true,
                   profile: {
                     select: {
                       phoneNumber: true,
@@ -44,8 +50,7 @@ export const getAndFilterChats: RequestHandler = async (
                     },
                   },
                 },
-              },
-              group: true
+              }
             },
           },
           messages: {
@@ -62,16 +67,32 @@ export const getAndFilterChats: RequestHandler = async (
               },
             },
           },
-          
+          group: {
+            include: {
+              participants: true,
+              Conversation: true
+            }
+          },
+          StarConversation:true
         },
         take: limit,
         skip: skip,
       });
 
       const total = await prisma.conversation.count();
+      const directConversations = conversations.filter((convo)=>convo.participants.length === 2)
+
+      const groupConversations = conversations.filter((convo)=>convo.participants.length > 2).map((group)=>group.group)
+      
+      const friendConvo = directConversations.filter((convo)=>convo.participants.find((parti)=>parti.userId !== user.userId)?.user.friends.some((frnd)=>frnd.userId === user.userId))
+
+      const starConvoersations = conversations.filter((convo)=>convo.StarConversation.find((convo)=>convo.userId === user.userId))
 
       res.json({
-        conversations,
+        directConversations: directConversations,
+        groupConversations: groupConversations,
+        friendConvo: friendConvo,
+        favouriteConvo:starConvoersations,
         totalResults: total,
         currentPage: page,
         totalPages: Math.ceil(total / limit),
@@ -79,254 +100,116 @@ export const getAndFilterChats: RequestHandler = async (
       return;
     }
 
+
     // Perform parallel searches
-    const [users, conversations, groups] = await Promise.all([
-      // Search users with their profiles
-      prisma.user.findMany({
-        where: {
-          OR: [
-            { name: { contains: searchTerm, mode: "insensitive" } },
-            { email: { contains: searchTerm, mode: "insensitive" } },
-            {
-              profile: {
-                OR: [
-                  { firstName: { contains: searchTerm, mode: "insensitive" } },
-                  { lastName: { contains: searchTerm, mode: "insensitive" } },
-                  {
-                    phoneNumber: { contains: searchTerm, mode: "insensitive" },
-                  },
-                  { nickname: { contains: searchTerm, mode: "insensitive" } },
-                ],
-              },
-            },
-          ],
-        },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          image: true,
-          profile: {
-            select: {
-              firstName: true,
-              lastName: true,
-              phoneNumber: true,
-              profilePicture: true,
-              gender: true,
-              bio: true,
-              nickname: true,
-              userId: true,
-              blockedBy: true,
-            },
-          },
+    const  conversations = await prisma.conversation.findMany({
+      where: {
+        OR: [
 
-        },
-        take: limit,
-        skip: skip,
-      }),
-
-      // Search conversations
-      prisma.conversation.findMany({
-        where: {
-          OR: [
-            {
-              messages: {
-                some: {
-                  content: { contains: searchTerm, mode: "insensitive" },
-                },
-              },
-            },
-            {
-              participants: {
-                some: {
-                  user: {
-                    OR: [
-                      { name: { contains: searchTerm, mode: "insensitive" } },
-                      {
-                        profile: {
-                          OR: [
-                            {
-                              firstName: {
-                                contains: searchTerm,
-                                mode: "insensitive",
-                              },
+          {
+            participants: {
+              some: {
+                user: {
+                  OR: [
+                    { name: { contains: searchTerm, mode: "insensitive" } },
+                    {
+                      profile: {
+                        OR: [
+                          {
+                            firstName: {
+                              contains: searchTerm,
+                              mode: "insensitive",
                             },
-                            {
-                              lastName: {
-                                contains: searchTerm,
-                                mode: "insensitive",
-                              },
+                          },
+                          {
+                            lastName: {
+                              contains: searchTerm,
+                              mode: "insensitive",
                             },
-                          ],
-                        },
+                          },
+                        ],
                       },
-                    ],
-                  },
-                },
-              },
-            },
-          ],
-        },
-        include: {
-          participants: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  image: true,
-                  profile: {
-                    select: {
-                      firstName: true,
-                      lastName: true,
-                      phoneNumber: true,
-                      profilePicture: true,
-                      gender: true,
-                      bio: true,
-                      nickname: true,
-                      userId: true,
-                      blockedBy: true,
                     },
+                  ],
+                },
+              },
+            },
+            group: {
+              name: { contains: searchTerm, mode: "insensitive"}
+            }
+          },
+        ],
+      },
+      include: {
+        participants: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+                friends: true,
+                profile: {
+                  select: {
+                    phoneNumber: true,
+                    firstName: true,
+                    lastName: true,
+                    profilePicture: true,
                   },
                 },
               },
-            },
+            }
           },
-          messages: {
-            where: {
-              content: { contains: searchTerm, mode: "insensitive" },
-            },
-            take: 3,
-            orderBy: {
-              createdAt: "desc",
-            },
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                },
+        },
+        messages: {
+          take: 1,
+          orderBy: {
+            createdAt: "desc",
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },
         },
-        take: limit,
-        skip: skip,
-      }),
-
-      // Search groups
-      prisma.group.findMany({
-        where: {
-          name: { contains: searchTerm, mode: "insensitive" },
+        group: {
+          include: {
+            participants: true,
+            Conversation: true
+          }
         },
-        include: {
-          creator: {
-            select: {
-              id: true,
-              name: true,
-              profile: {
-                select: {
-                  profilePicture: true,
-                },
-              },
-            },
-          },
-          admin: {
-            select: {
-              firstName: true,
-              lastName: true,
-              profilePicture: true,
-            },
-          },
-          participants: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  profile: {
-                    select: {
-                      profilePicture: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        take: limit,
-        skip: skip,
-      }),
-    ]);
+        StarConversation:true
+      },
+      take: limit,
+      skip: skip,
+    })
 
     // Get total counts for pagination
-    const [totalUsers, totalConversations, totalGroups] = await Promise.all([
-      prisma.user.count({
-        where: {
-          OR: [
-            { name: { contains: searchTerm, mode: "insensitive" } },
-            { email: { contains: searchTerm, mode: "insensitive" } },
-            {
-              profile: {
-                OR: [
-                  { firstName: { contains: searchTerm, mode: "insensitive" } },
-                  { lastName: { contains: searchTerm, mode: "insensitive" } },
-                  {
-                    phoneNumber: { contains: searchTerm, mode: "insensitive" },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      }),
-      prisma.conversation.count({
-        where: {
-          OR: [
-            {
-              messages: {
-                some: {
-                  content: { contains: searchTerm, mode: "insensitive" },
-                },
-              },
-            },
-            {
-              participants: {
-                some: {
-                  user: {
-                    name: { contains: searchTerm, mode: "insensitive" },
-                  },
-                },
-              },
-            },
-          ],
-        },
-      }),
-      prisma.group.count({
-        where: {
-          name: { contains: searchTerm, mode: "insensitive" },
-        },
-      }),
-    ]);
+    const total = await prisma.conversation.count();
 
-    const response: SearchResponse = {
-      users,
-      conversations,
-      groups,
-      totalResults: totalUsers + totalConversations + totalGroups,
-    };
-    console.log({
-      ...response,
-      currentPage: page,
-      totalPages: Math.ceil(response.totalResults / limit),
-    });
+    const directConversations = conversations.filter((convo)=>convo.participants.length === 2)
+
+    const groupConversations = conversations.filter((convo)=>convo.participants.length > 2).map((group)=>group.group)
+    
+    const friendConvo = directConversations.filter((convo)=>convo.participants.find((parti)=>parti.userId !== user.userId)?.user.friends.some((frnd)=>frnd.userId === user.userId))
+
+    const starConvoersations = conversations.filter((convo)=>convo.StarConversation.find((convo)=>convo.userId === user.userId))
 
     res.json({
-      ...response,
+      directConversations: directConversations,
+      groupConversations: groupConversations,
+      friendConvo: friendConvo,
+      favouriteConvo:starConvoersations,
+      totalResults: total,
       currentPage: page,
-      totalPages: Math.ceil(response.totalResults / limit),
+      totalPages: Math.ceil(total / limit),
     });
     return;
+
   } catch (error) {
     console.error("Error in search:", error);
     res.status(500).json({
