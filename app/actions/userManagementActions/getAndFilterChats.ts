@@ -45,6 +45,7 @@ export const getAndFilterChats: RequestHandler = async (
                   },
                 },
               },
+              group: true
             },
           },
           messages: {
