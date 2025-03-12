@@ -16,6 +16,8 @@ import sendMessage from '../actions/messageActions/sendMessage';
 import deleteMessage from '../actions/messageActions/deleteMessage';
 import getConversationWithrecepientId from '../actions/messageActions/getConversationWithrecepientId';
 import getSearchUsers from '../actions/userManagementActions/getSearchUsers';
+import starMessage from '../actions/messageActions/starMessage';
+import unStarMessage from '../actions/messageActions/unStarMessage';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -47,5 +49,7 @@ router.post('/send-message:conversationId', authenticateToken, sendMessage)
 router.delete('/delete-message/:messageId', authenticateToken, deleteMessage)
 router.patch('/update-message/:messageId', authenticateToken)
 router.get( `/conversation-recepientId`,authenticateToken, getConversationWithrecepientId)
+router.post(`/star-message`,authenticateToken, starMessage)
+router.delete(`/unStar-message`, authenticateToken, unStarMessage )
 
 export default router;
