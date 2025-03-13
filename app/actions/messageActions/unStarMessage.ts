@@ -3,8 +3,7 @@ import { prisma } from "../../configs/prisma";
 
 const unStarMessage: RequestHandler = async (req: Request, res: Response) => {
   const user = req.user;
-  const { staringData } = req.body;
-  const { messageId, currentProfileId } = staringData;
+  const { messageId, currentProfileId } = req.body;
 
   if (!user) {
     res.status(401).json({ message: "Unauthorized" });

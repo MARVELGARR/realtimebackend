@@ -3,8 +3,7 @@ import { prisma } from "../../configs/prisma";
 
 const starMessage: RequestHandler = async (req: Request, res: Response) => {
   const user = req.user;
-  const { staringData } = req.body;
-  const { messageId, currentProfileId } = staringData;
+  const { messageId, currentProfileId } = req.body;
 
   if (!messageId) {
     res.status(400).json({ message: "Message ID is required" });
