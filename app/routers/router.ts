@@ -50,6 +50,6 @@ router.delete('/delete-message/:messageId', authenticateToken, deleteMessage)
 router.patch('/update-message/:messageId', authenticateToken)
 router.get( `/conversation-recepientId`,authenticateToken, getConversationWithrecepientId)
 router.post(`/star-message`,authenticateToken, starMessage)
-router.delete(`/unStar-message`, authenticateToken, unStarMessage )
+router.post(`/unStar-message`, authenticateToken, unStarMessage )
 
 export default router;
