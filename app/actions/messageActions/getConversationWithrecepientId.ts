@@ -27,7 +27,8 @@ const getConversationWithrecepientId: RequestHandler = async( req: Request, res:
             include: {
                 messages: {
                     include: {
-                        user: true
+                        user: true,
+                        StarredMessage: true
                     }
                 },
                 participants: { 
