@@ -11,7 +11,8 @@ const deleteMessages: RequestHandler= async (req: Request,res: Response) => {
     }
 
     const {messageIds}: {messageIds: string[]} = req.body
-    if(!messageIds || messageIds.length < 1){
+
+    if(!messageIds){
         res.status(404).json({message: "messageIds not found"})
         throw new Error("messageIds not found")
     } 
