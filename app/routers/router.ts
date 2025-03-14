@@ -18,6 +18,7 @@ import getConversationWithrecepientId from '../actions/messageActions/getConvers
 import getSearchUsers from '../actions/userManagementActions/getSearchUsers';
 import starMessage from '../actions/messageActions/starMessage';
 import unStarMessage from '../actions/messageActions/unStarMessage';
+import deleteMessages from '../actions/messageActions/deleteMessages';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -51,5 +52,6 @@ router.patch('/update-message/:messageId', authenticateToken)
 router.get( `/conversation-recepientId`,authenticateToken, getConversationWithrecepientId)
 router.post(`/star-message`,authenticateToken, starMessage)
 router.post(`/unStar-message`, authenticateToken, unStarMessage )
+router.post(`/delete-messages`, authenticateToken, deleteMessages)
 
 export default router;
