@@ -19,6 +19,7 @@ import getSearchUsers from '../actions/userManagementActions/getSearchUsers';
 import starMessage from '../actions/messageActions/starMessage';
 import unStarMessage from '../actions/messageActions/unStarMessage';
 import deleteMessages from '../actions/messageActions/deleteMessages';
+import getRecepientProfile from '../actions/chatActions/getRecepientProfile';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -53,5 +54,10 @@ router.get( `/conversation-recepientId`,authenticateToken, getConversationWithre
 router.post(`/star-message`,authenticateToken, starMessage)
 router.post(`/unStar-message`, authenticateToken, unStarMessage )
 router.post(`/delete-messages`, authenticateToken, deleteMessages)
+
+
+//chat routes
+
+router.get('/get-recepient-profile/:recepientId', authenticateToken, getRecepientProfile)
 
 export default router;
