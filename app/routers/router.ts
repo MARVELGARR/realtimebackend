@@ -20,6 +20,7 @@ import starMessage from '../actions/messageActions/starMessage';
 import unStarMessage from '../actions/messageActions/unStarMessage';
 import deleteMessages from '../actions/messageActions/deleteMessages';
 import getRecepientProfile from '../actions/chatActions/getRecepientProfile';
+import addFriend from '../actions/interAction/addFriend';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -57,7 +58,10 @@ router.post(`/delete-messages`, authenticateToken, deleteMessages)
 
 
 //chat routes
-
 router.get('/get-recepient-profile/:recepientId', authenticateToken, getRecepientProfile)
+
+
+// user interActions
+router.post('/add-friend', authenticateToken, addFriend)
 
 export default router;

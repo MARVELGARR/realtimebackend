@@ -28,6 +28,8 @@ model User {
   
 
   StarConversation StarConversation[]
+
+  Friend Friend[] @relation("FriendAdded")
 }
 
 model Account {
@@ -195,8 +197,11 @@ model Friend {
 
   // Relations
   userId       String   @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation( fields: [userId], references: [id], onDelete: Cascade)
 
+  friendId String   @db.ObjectId
+  friend User @relation( "FriendAdded", fields: [friendId], references: [id], onDelete: Cascade)
+  
 
   @@unique([userId])
 }

@@ -140,9 +140,9 @@ export const getAndFilterChats: RequestHandler = async (
       .map((convo) => convo.group);
 
     const friendConvo = directConversations.filter((convo) =>
-      convo.participants.find((parti) => parti.userId !== user.userId)?.user.friends.some(
-        (friend) => friend.userId === user.userId
-      )
+      convo.participants.find((parti) => parti.userId !== user.userId)?.user.friends.filter((cri)=>{
+        cri.userId === user.userId
+      })
     );
 
     const favouriteConvo = conversations.filter((convo) =>

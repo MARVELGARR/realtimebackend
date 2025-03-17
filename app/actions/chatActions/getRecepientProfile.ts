@@ -13,7 +13,7 @@ const getRecepientProfile: RequestHandler = async (
   }
 
   if (!recepientId) {
-    res.status(404).json({ message: "recepientId not found" });
+    res.status(400).json({ message: "recepientId not found" });
     return;
   }
   try {
@@ -37,6 +37,12 @@ const getRecepientProfile: RequestHandler = async (
             profilePicture: true,
           },
         },
+        Friend: {
+          select: {
+            friendId: true,
+            userId:true
+          }
+        }
       },
     });
     if (recepientProfile) {
