@@ -22,6 +22,8 @@ import deleteMessages from '../actions/messageActions/deleteMessages';
 import getRecepientProfile from '../actions/chatActions/getRecepientProfile';
 import addFriend from '../actions/interAction/addFriend';
 import unFriend from '../actions/interAction/unFriend';
+import singleFileUpload from '../actions/fileUploadActions/fileUpload';
+import { upload } from '../middleware/multer';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -65,5 +67,6 @@ router.get('/get-recepient-profile/:recepientId', authenticateToken, getRecepien
 // user interActions
 router.post('/add-friend', authenticateToken, addFriend)
 router.post(`/un-friend`, authenticateToken, unFriend)
+router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
 
 export default router;
