@@ -30,6 +30,8 @@ model User {
   StarConversation StarConversation[]
 
   Friend Friend[] @relation("FriendAdded")
+
+  Group Group[] @relation("GroupAdmin")
 }
 
 model Account {
@@ -89,7 +91,7 @@ model Profile {
   profilePicture String?
   userId    String   @db.ObjectId @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  adminOf   Group[]  @relation("GroupAdmin")
+
   blockedUsers  Block[]  @relation("Blocker")
   blockedBy     Block[]  @relation("Blocked")
   privacy Privacy?
@@ -183,7 +185,7 @@ model Group {
   creatorId String   @db.ObjectId
   creator   User     @relation("GroupCreator", fields: [creatorId], references: [id])
   adminId   String   @db.ObjectId
-  admin     Profile  @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  admin     User  @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: Cascade)
   participants ConversationParticipant[]
 
   Conversation Conversation[]
