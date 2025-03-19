@@ -132,14 +132,14 @@ export const getAndFilterChats: RequestHandler = async (
     });
 
     const directConversations = conversations.filter(
-      (convo) => convo.participants.length === 2
+      (convo) => convo.participants.length === 2 && !convo.groupId
     );
 
     const groupConversations = conversations
       .filter((convo) => convo.participants.length > 2)
       .map((convo) => convo.group);
 
-    const friendConvo = directConversations.filter((convo) =>
+    const friendConvo = directConversations.filter((convo) => !convo.groupId &&
       convo.participants.find((parti) => parti.userId !== user.userId)?.user.friends.filter((cri)=>{
         cri.userId === user.userId
       })
