@@ -1,5 +1,5 @@
 import { Response, Request, RequestHandler } from "express";
-import Cloudinary from "../../configs/cloudinary";
+import cloudinary from "../../configs/cloudinary";
 
 const singleFileUpload: RequestHandler = async (req: Request, res: Response) => {
   try {
@@ -8,6 +8,7 @@ const singleFileUpload: RequestHandler = async (req: Request, res: Response) => 
        res.status(400).json({ error: "No file uploaded" });
        return
     }
+    console.log(req.file)
 
     // Convert buffer to base64 for Cloudinary
     const base64String = `data:${
@@ -15,7 +16,7 @@ const singleFileUpload: RequestHandler = async (req: Request, res: Response) => 
     };base64,${req.file.buffer.toString("base64")}`;
 
     // Upload file to Cloudinary
-    const result = await Cloudinary.uploader.upload(base64String, {
+    const result = await cloudinary.uploader.upload(base64String, {
       folder: "uploads", // Cloudinary folder
       resource_type: "auto", // Auto-detect file type
     });
@@ -35,6 +36,7 @@ const singleFileUpload: RequestHandler = async (req: Request, res: Response) => 
         return
     }
   } catch (error) {
+    console.error(error)
     res.status(500).json({ error: "Upload failed" });
     return
   }
