@@ -136,7 +136,7 @@ export const getAndFilterChats: RequestHandler = async (
     );
 
     const groupConversations = conversations
-      .filter((convo) => convo.participants.length > 2)
+      .filter((convo) => convo.participants.length > 2 && convo.groupId)
       .map((convo) => convo.group);
 
     const friendConvo = directConversations.filter((convo) => !convo.groupId &&
