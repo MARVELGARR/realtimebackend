@@ -180,6 +180,7 @@ model Group {
   disappearingMessages DisappearingMessages @default(OFF)
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @default(now())
+  descriptions String?
 
   // Relations
   creatorId String   @db.ObjectId

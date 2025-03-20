@@ -25,6 +25,7 @@ import unFriend from '../actions/interAction/unFriend';
 import singleFileUpload from '../actions/fileUploadActions/fileUpload';
 import { upload } from '../middleware/multer';
 import createGroup from '../actions/groupActions/createGroup';
+import getGroupConversation from '../actions/conversationActions/getGroupConversation';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -56,6 +57,7 @@ router.post('/send-message:conversationId', authenticateToken, sendMessage)
 router.delete('/delete-message/:messageId', authenticateToken, deleteMessage)
 router.patch('/update-message/:messageId', authenticateToken)
 router.get( `/conversation-recepientId`,authenticateToken, getConversationWithrecepientId)
+router.get( `/groupConversation:conversationId`,authenticateToken, getGroupConversation)
 router.post(`/star-message`,authenticateToken, starMessage)
 router.post(`/unStar-message`, authenticateToken, unStarMessage )
 router.post(`/delete-messages`, authenticateToken, deleteMessages)
