@@ -58,7 +58,8 @@ const createGroup: RequestHandler = async( req: Request, res: Response) => {
                 create: {
                   participants: {
                     create: [...newGroupDetails.participant.map((id) => ({ userId: id }))]
-                  }
+                  },
+                  
                 }
               },
             disappearingMessages: newGroupDetails.disappearingMessages,
