@@ -47,26 +47,34 @@ const createGroup: RequestHandler = async( req: Request, res: Response) => {
 
         const newGroup = await prisma.group.create({
             data: {
-            name: newGroupDetails.name,
-            admin: {
+              name: newGroupDetails.name,
+              admin: {
                 connect: { id: user.userId }
-            },
-            creator: {
+              },
+              creator: {
                 connect: { id: user.userId }
-            },
-          Conversation: {
+              },
+              Conversation: {
                 create: {
                   participants: {
                     create: [...newGroupDetails.participant.map((id) => ({ userId: id }))]
-                  },
-                  
+                  }
                 }
               },
-            disappearingMessages: newGroupDetails.disappearingMessages,
-            groupImage: newGroupDetails.groupImage[0]
-            
+              participants: {
+                create: [...newGroupDetails.participant.map((id) => ({
+                  user: {
+                    connect: { id: id }
+                  },
+                  conversation: {
+                    connect: { id: '$Conversation.id' } // This is a special syntax to reference the ID of the conversation being created
+                  }
+                }))]
+              },
+              disappearingMessages: newGroupDetails.disappearingMessages,
+              groupImage: newGroupDetails.groupImage[0]
             }
-        });
+          });
 
         // Respond with the created group details
         res.status(201).json({ message: "Group created successfully", group: newGroup });
