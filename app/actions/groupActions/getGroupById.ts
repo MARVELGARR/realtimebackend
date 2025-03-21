@@ -6,7 +6,7 @@ const getGroupById: RequestHandler = async(req: Request, res: Response) => {
 
     const user = req.user
     const {groupId} = req.params
-    if(user){
+    if(!user){
         res.status(200).json({message: "user not logged in"})
         return
     }
