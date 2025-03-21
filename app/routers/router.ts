@@ -83,6 +83,6 @@ router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
 
 // Group routes
 router.post("/createGroup",authenticateToken, createGroup)
-router.get("get-group-profile-by-id/:groupId", authenticateToken, getGroupById)
+router.get("/get-group-profile-by-id/:groupId", authenticateToken, getGroupById)
 
 export default router;
