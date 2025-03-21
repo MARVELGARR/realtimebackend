@@ -8,9 +8,11 @@ const getGroupById: RequestHandler = async(req: Request, res: Response) => {
     const {groupId} = req.params
     if(user){
         res.status(200).json({message: "user not logged in"})
+        return
     }
     if(!groupId){
         res.status(404).json({error: " groupId is required"})
+        return
     }
 
     try{
@@ -24,13 +26,16 @@ const getGroupById: RequestHandler = async(req: Request, res: Response) => {
         })
         if(group){
             res.status(200).json(group)
+            return
         }
         else{
             res.status(404).json([])
+            return
         }
     }
     catch(error){
         res.status(500).json({error: "something went wrong"})
+        return
     }
     
 }
