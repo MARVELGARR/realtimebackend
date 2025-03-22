@@ -10,6 +10,7 @@ export type newGroupDetailsProp = {
     participant: string[],
     groupImage: string[] 
     disappearingMessages: disappearingMessages
+    description: string
     
 }
 
@@ -44,8 +45,8 @@ const createGroup: RequestHandler = async( req: Request, res: Response) => {
             res.status(400).json({ error: "Group name is required" });
             return
         }
-
-        const newGroup = await prisma.group.create({
+        const result = await prisma.$transaction(async (tx) => {
+          const newGroup = await tx.group.create({
             data: {
               name: newGroupDetails.name,
               admin: {
@@ -61,23 +62,40 @@ const createGroup: RequestHandler = async( req: Request, res: Response) => {
                   }
                 }
               },
-              participants: {
-                create: [...newGroupDetails.participant.map((id) => ({
-                  user: {
-                    connect: { id: id }
-                  },
-                  conversation: {
-                    connect: { id: '$Conversation.id' } // This is a special syntax to reference the ID of the conversation being created
-                  }
-                }))]
-              },
+              descriptions: newGroupDetails.description,
               disappearingMessages: newGroupDetails.disappearingMessages,
               groupImage: newGroupDetails.groupImage[0]
+            },
+            include: {
+              Conversation: {
+                select: {
+                  id: true,
+                  participants: true
+                }
+              }
             }
           });
+        
+          const addParticipant = await tx.group.update({
+            where: {
+              id: newGroup.id
+            },
+            data: {
+              participants: {
+                connect: newGroup.Conversation.flatMap((par) => 
+                  par.participants.map((participant) => ({ id: participant.id }))
+                )
+              },
+            }
+          });
+        
+          return { newGroup, addParticipant };
+        });
+        
+        
 
-        // Respond with the created group details
-        res.status(201).json({ message: "Group created successfully", group: newGroup });
+        
+        res.status(201).json({ message: "Group created successfully", group: result.newGroup });
     } catch (error) {
         console.error("Error creating group:", error);
         res.status(500).json({ message: "Internal server error" });
