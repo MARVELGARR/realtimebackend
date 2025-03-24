@@ -42,6 +42,12 @@ const getGroupParticipant:RequestHandler = async(req:Request, res:Response) =>{
                 name: true,
                 email: true,
                 image: true,
+                profile:{
+                    select:{
+                        bio: true,
+                        profilePicture: true,
+                    }
+                }
                 
             }
           }      
