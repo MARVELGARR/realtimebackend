@@ -166,6 +166,7 @@ model ConversationParticipant {
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   groupId        String?      @db.ObjectId
   group          Group?       @relation(fields: [groupId], references: [id])
+  groupRole      GroupRole?    @default(PARTICIPANT)
 
   @@unique([userId, conversationId])
 }
@@ -181,7 +182,7 @@ model Group {
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @default(now())
   descriptions String?
-
+  
   // Relations
   creatorId String   @db.ObjectId
   creator   User     @relation("GroupCreator", fields: [creatorId], references: [id])
@@ -267,7 +268,7 @@ enum ChatType {
   GROUP
 }
 
-enum Role {
-  USER
+enum GroupRole {
+  PARTICIPANT
   ADMIN
 }
