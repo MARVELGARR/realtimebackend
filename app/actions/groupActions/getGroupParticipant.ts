@@ -55,8 +55,40 @@ const getGroupParticipant:RequestHandler = async(req:Request, res:Response) =>{
         }
 
       })
+
+      const totalParticipants = await prisma.conversationParticipant.count({
+        where: {
+            conversationId: conversationId,
+            ...(searchQuery && {
+                user: {
+                    name: {
+                        contains: searchQuery,
+                        mode: "insensitive"
+                    }
+                }
+            })
+        },
+        skip,
+        take: limit,
+        orderBy: {
+            user:{
+                name: "asc"
+            }
+        }
+      })
+      const totalPages = Math.ceil(totalParticipants / limit)
+        const hasNextPage = page < totalPages
       
-      res.status(200).json(groupParticipant)
+      res.status(200).json({
+            participants: groupParticipant,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                hasNextPage,
+                totalParticipants,
+                limit
+            }
+      })
       return
 
     }
