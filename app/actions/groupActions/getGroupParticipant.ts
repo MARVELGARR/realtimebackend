@@ -8,7 +8,7 @@ const getGroupParticipant:RequestHandler = async(req:Request, res:Response) =>{
         res.status(401).json({error: "user not logged in"})
         return
     }
-    const conversationId = req.params.groupId as string
+    const conversationId = req.params.conversationId as string
     const searchQuery = req.query.searchQuery as string
     const page = parseInt(req.query.page as string) || 1
     const limit = parseInt(req.query.limit as string) || 5
