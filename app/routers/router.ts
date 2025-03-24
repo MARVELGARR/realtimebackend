@@ -30,6 +30,7 @@ import starGroupMessage from '../actions/groupActions/starGroupMessage';
 import unStarGroupMessage from '../actions/groupActions/unStarGroupMessage';
 import deleteGroupMessages from '../actions/messageActions/deleteGroupMessage';
 import getGroupById from '../actions/groupActions/getGroupById';
+import getGroupParticipant from '../actions/groupActions/getGroupParticipant';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -84,5 +85,6 @@ router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
 // Group routes
 router.post("/createGroup",authenticateToken, createGroup)
 router.get("/get-group-profile-by-id/:groupId", authenticateToken, getGroupById)
+router.get("/get-group-participants/:conversationId", authenticateToken, getGroupParticipant)
 
 export default router;
