@@ -87,5 +87,5 @@ router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
 router.post("/createGroup",authenticateToken, createGroup)
 router.get("/get-group-profile-by-id/:groupId", authenticateToken, getGroupById)
 router.get("/get-group-participants/:conversationId", authenticateToken, getGroupParticipant)
-router.patch("/edit-group/:groupId", authenticateToken, editGroup)
+router.patch("/edit-group-details/:groupId", authenticateToken, editGroup)
 export default router;
