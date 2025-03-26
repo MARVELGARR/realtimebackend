@@ -36,6 +36,7 @@ const sendMessage = async (req: Request, res: Response) => {
               id: user.userId
             }
           },
+          type: "DIRECT",
           editableUntil: editExpire,
           conversation: {
             connect: {
@@ -57,6 +58,7 @@ const sendMessage = async (req: Request, res: Response) => {
               id: user.userId
             }
           },
+          type: "DIRECT",
           editableUntil: editExpire,
           conversation: {
             create: {

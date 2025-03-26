@@ -28,10 +28,12 @@ import createGroup from '../actions/groupActions/createGroup';
 import getGroupConversation from '../actions/conversationActions/getGroupConversation';
 import starGroupMessage from '../actions/groupActions/starGroupMessage';
 import unStarGroupMessage from '../actions/groupActions/unStarGroupMessage';
-import deleteGroupMessages from '../actions/messageActions/deleteGroupMessage';
 import getGroupById from '../actions/groupActions/getGroupById';
 import getGroupParticipant from '../actions/groupActions/getGroupParticipant';
 import editGroup from '../actions/groupActions/editGroup';
+import sendGroupMessage from '../actions/messageActions/sendGroupMessage';
+import deleteGroupMessages from '../actions/messageActions/deleteGroupMessages';
+import deleteGroupMessage from '../actions/groupActions/deleteGroupMessage';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -68,11 +70,6 @@ router.post(`/star-message`,authenticateToken, starMessage)
 router.post(`/unStar-message`, authenticateToken, unStarMessage )
 router.post(`/delete-messages`, authenticateToken, deleteMessages)
 
-router.post(`/star-group-message`,authenticateToken, starGroupMessage)
-router.post(`/unStar-group-message`, authenticateToken, unStarGroupMessage )
-router.post(`/delete-group-messages`, authenticateToken, deleteGroupMessages)
-
-
 
 //chat routes
 router.get('/get-recepient-profile/:recepientId', authenticateToken, getRecepientProfile)
@@ -84,8 +81,15 @@ router.post(`/un-friend`, authenticateToken, unFriend)
 router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
 
 // Group routes
+router.post(`/send-group-message/:conversationId`, authenticateToken, sendGroupMessage)
+router.post(`/star-group-message`,authenticateToken, starGroupMessage)
+router.post(`/unStar-group-message`, authenticateToken, unStarGroupMessage )
+router.delete(`/delete-group-messages/:conversationId`, authenticateToken, deleteGroupMessages)
+router.delete(`/delete-group-message/:messageId`, authenticateToken, deleteGroupMessage)
 router.post("/createGroup",authenticateToken, createGroup)
 router.get("/get-group-profile-by-id/:groupId", authenticateToken, getGroupById)
 router.get("/get-group-participants/:conversationId", authenticateToken, getGroupParticipant)
-router.patch("/edit-group-details/:groupId", authenticateToken, editGroup)
+router.patch("/edit-group-details/:groupId", upload.fields([{name: "description"}, {name: "description"}, {name: "disappearingMessages"}, {name: "groupImage"}]), authenticateToken, editGroup)
+
+
 export default router;

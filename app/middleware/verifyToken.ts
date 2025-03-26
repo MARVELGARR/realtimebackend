@@ -40,7 +40,7 @@ export const authenticateToken : RequestHandler = async (
 
 
 
-    console.log("Decoded token:", decoded);
+    
 
     req.user  = decoded; // Attach user data to request object
     next();

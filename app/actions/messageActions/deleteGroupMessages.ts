@@ -10,6 +10,7 @@ const deleteGroupMessages: RequestHandler = async (req: Request,res: Response) =
         return
     }
 
+    const {conversationId} = req.params
     const {messageIds}: {messageIds: string[]} = req.body
 
     if(!messageIds){

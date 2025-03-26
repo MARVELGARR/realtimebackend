@@ -8,7 +8,7 @@ const editGroup: RequestHandler = async(req: Request, res:Response) => {
     const {groupId} = req.params
     const name = req.body.name
     const description = req.body.description
-    const groupImage = req.body.image
+    const groupImage = req.body.groupImage
     const disappearingMessages = req.body.disappearingMessages
     if(!user){
         res.status(200).json({message: "user not logged in"})

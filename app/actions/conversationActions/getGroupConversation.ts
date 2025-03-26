@@ -58,6 +58,7 @@ const getGroupConversation: RequestHandler = async( req: Request, res: Response)
                         disappearingMessages: true,
                         groupImage: true,
                         name: true,
+                        descriptions: true,
                         createdAt: true,
                         updatedAt: true,
                         id: true
