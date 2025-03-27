@@ -19,12 +19,7 @@ const getGroupConversation: RequestHandler = async( req: Request, res: Response)
                 id: conversationId
             },
             include: {
-                messages: {
-                    include: {
-                        user: true,
-                        StarredMessage: true
-                    }
-                },
+
                 participants: { 
                     include: {
                         user: {

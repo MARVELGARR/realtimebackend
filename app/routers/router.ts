@@ -34,6 +34,7 @@ import editGroup from '../actions/groupActions/editGroup';
 import sendGroupMessage from '../actions/messageActions/sendGroupMessage';
 import deleteGroupMessages from '../actions/messageActions/deleteGroupMessages';
 import deleteGroupMessage from '../actions/groupActions/deleteGroupMessage';
+import getGroupMessages from '../actions/groupActions/getGroupMessages';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -90,6 +91,6 @@ router.post("/createGroup",authenticateToken, createGroup)
 router.get("/get-group-profile-by-id/:groupId", authenticateToken, getGroupById)
 router.get("/get-group-participants/:conversationId", authenticateToken, getGroupParticipant)
 router.patch("/edit-group-details/:groupId", upload.fields([{name: "description"}, {name: "description"}, {name: "disappearingMessages"}, {name: "groupImage"}]), authenticateToken, editGroup)
-
+router.get("/get-group-messages/:conversationId", authenticateToken, getGroupMessages)
 
 export default router;

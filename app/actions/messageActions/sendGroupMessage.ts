@@ -37,7 +37,7 @@ const sendGroupMessage: RequestHandler = async (
       },
     });
 
-    res.status(200).json(message);
+    res.status(200).json(groupmessage);
     return;
   } catch (error) {
     res.status(500).json({ error: "something went wrong" });

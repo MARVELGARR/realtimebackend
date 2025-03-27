@@ -7,6 +7,18 @@ dotenv.config()
 export let io: Server;
 
 
+export type groupMessageProp ={
+
+    conversationId: string;
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: string;
+    type: "DIRECT" | "GROUP";
+    content: string;
+    editableUntil: Date;
+}
+
 export function initializeSocket(server: any){
     io = new Server(server, { cors: corsOptions });
 
@@ -18,11 +30,11 @@ export function initializeSocket(server: any){
             socket.join(conversationId);
             console.log(userId, "Joined")
         });
-        socket.on("send-group-message", async ({userId, conversationId, groupId,message}) => {
-            console.log(`Sending message to group ${groupId}: ${message}`);
+        socket.on("send-group-message", async ({...prop}:groupMessageProp) => {
+            console.log(`Sending message to conversation ${prop.conversationId}: ${prop.content}`);
     
             
-            io.to(conversationId).emit("receive-group-message", { message, userId });
+            io.to(prop.conversationId).emit("receive-group-message", { ...prop });
     
             // Save message to database
 
