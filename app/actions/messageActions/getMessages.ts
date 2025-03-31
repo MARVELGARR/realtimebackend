@@ -1,18 +1,18 @@
 import { Request, Response, RequestHandler } from "express";
 import { prisma } from "../../configs/prisma";
 
-const getGroupMessages: RequestHandler = async (
+const getMessages: RequestHandler = async (
   req: Request,
   res: Response
 ) => {
   const user = req.user;
-  const { conversationId } = req.params;
+  const { recepientId } = req.params;
   if (!user) {
     res.status(200).json({ message: "user not logged in" });
     return;
   }
-  if (!conversationId) {
-    res.status(404).json({ error: " conversationId is required" });
+  if (!recepientId) {
+    res.status(404).json({ error: " recepientId is required" });
     return;
   }
 
@@ -20,9 +20,19 @@ const getGroupMessages: RequestHandler = async (
   const limit = parseInt(req.query.limit as string) 
 
   try {
-    const groupMessages = await prisma.message.findMany({
+    const Messages = await prisma.message.findMany({
       where: {
-        conversationId,
+        conversation: {
+            participants: {
+                every:{
+                    userId: { in: [
+                        user.userId,
+                        recepientId
+                      ]}
+                }
+            }
+        },
+        type: "DIRECT"
       },
       include: {
         StarredMessage: {
@@ -44,14 +54,14 @@ const getGroupMessages: RequestHandler = async (
       skip: cursor ? 1 : 0, 
     });
 
-      const hasNextPage = groupMessages.length > limit;
-      const nextCursor = hasNextPage ? groupMessages.pop()?.id : null;
+      const hasNextPage = Messages.length > limit;
+      const nextCursor = hasNextPage ? Messages.pop()?.id : null;
 
         
      
-    if (groupMessages) {
+    if (Messages) {
         res.status(200).json({
-            GroupMessages: groupMessages,
+            Messages: Messages,
             pagination: {
                 hasNextPage,
                 nextCursor,
@@ -70,4 +80,4 @@ const getGroupMessages: RequestHandler = async (
   }
 };
 
-export default getGroupMessages;
+export default getMessages;

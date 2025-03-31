@@ -35,6 +35,7 @@ import sendGroupMessage from '../actions/messageActions/sendGroupMessage';
 import deleteGroupMessages from '../actions/messageActions/deleteGroupMessages';
 import deleteGroupMessage from '../actions/groupActions/deleteGroupMessage';
 import getGroupMessages from '../actions/groupActions/getGroupMessages';
+import getMessages from '../actions/messageActions/getMessages';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -66,6 +67,7 @@ router.post('/send-message:conversationId', authenticateToken, sendMessage)
 router.delete('/delete-message/:messageId', authenticateToken, deleteMessage)
 router.patch('/update-message/:messageId', authenticateToken)
 router.get( `/conversation-recepientId`,authenticateToken, getConversationWithrecepientId)
+router.get('/get-messages/:recepientId',authenticateToken, getMessages )
 router.get( `/groupConversation:conversationId`,authenticateToken, getGroupConversation)
 router.post(`/star-message`,authenticateToken, starMessage)
 router.post(`/unStar-message`, authenticateToken, unStarMessage )

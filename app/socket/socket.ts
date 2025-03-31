@@ -7,17 +7,45 @@ dotenv.config()
 export let io: Server;
 
 
-export type groupMessageProp ={
-
-    conversationId: string;
+interface User {
     id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    userId: string;
-    type: "DIRECT" | "GROUP";
+    name: string;
+    email: string;
+    emailVerified: string | null;
+    image: string;
+    password: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+  
+  interface StarredMessages {
+    id: string;
+    profileId: string;
+    messageId: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+  
+  export interface GroupMessageProp {
+  
+    id: string;
     content: string;
-    editableUntil: Date;
+    createdAt: string;
+    updatedAt: string;
+    type: "GROUP" | "DIRECT"; // Adjust as needed
+    userId: string;
+    conversationId: string;
+    editableUntil: string;
+    StarredMessage: StarredMessages[]; // Adjust if StarredMessage has a specific structure
+    user: User;
+  }
+
+  export type sendMessageProp = {
+    recepientId?: string,
+    newMessage: GroupMessageProp,
 }
+
+
 
 export function initializeSocket(server: any){
     io = new Server(server, { cors: corsOptions });
@@ -25,12 +53,24 @@ export function initializeSocket(server: any){
     io.on("connection", (socket) => {
         console.log("A user connected:", socket.id);
         
+        socket.on("join-conversation", ({recepientId, userId})=>{
+            socket.join(`${recepientId}:${userId}`)
+        })
+
+        socket.on("send-message", async ({...prop}:sendMessageProp)=>{
+            io.to(`${prop.recepientId}:${prop.newMessage.userId}`).emit("receive-message", { ...prop });
+        })
+
+
+        //groups
     
-        socket.on("join-conversation", ({conversationId, groupId, userId }) => {
+        socket.on("join-group-conversation", ({conversationId, groupId, userId }) => {
             socket.join(conversationId);
             console.log(userId, "Joined")
         });
-        socket.on("send-group-message", async ({...prop}:groupMessageProp) => {
+
+
+        socket.on("send-group-message", async ({...prop}:GroupMessageProp) => {
             console.log(`Sending message to conversation ${prop.conversationId}: ${prop.content}`);
     
             

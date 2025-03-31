@@ -10,10 +10,10 @@ const formSchema = z.object({
 export type MessageFormData = z.infer<typeof formSchema>;
 
 const sendMessage = async (req: Request, res: Response) => {
-  const { conversationId } = req.params;
+  const { reciepientId } = req.params;
   const messageBody = req.body;
 
-  const { reciepientId, message } = messageBody as MessageFormData;
+  const { message } = messageBody as MessageFormData;
 
   if (!req.user) {
     res.status(401).json({ error: "Unauthorized" });
@@ -26,7 +26,7 @@ const sendMessage = async (req: Request, res: Response) => {
 
     let newMessage;
     const editExpire = new Date(new Date().getTime() + 20 * 60000);
-    if (conversationId && conversationId !== "undefined") {
+    if (reciepientId && reciepientId !== "undefined") {
       // If conversationId is provided, connect to the existing conversation
       newMessage = await prisma.message.create({
         data: {
@@ -40,7 +40,21 @@ const sendMessage = async (req: Request, res: Response) => {
           editableUntil: editExpire,
           conversation: {
             connect: {
-              id: conversationId
+              id: (
+                await prisma.conversation.findFirst({
+                  where: {
+                    participants: {
+                      every: {
+                        userId: { in: [ 
+                          user.userId,
+                          reciepientId as string
+                        ]}
+                      }
+                    }
+                  },
+                  select: { id: true }
+                })
+              )?.id
             }
           }
         },
@@ -65,26 +79,43 @@ const sendMessage = async (req: Request, res: Response) => {
               participants: {
                 create: [
                   { userId: user.userId },
-                  { userId: parsedData.reciepientId as string }
+                  ...(parsedData.reciepientId ? [{ userId: parsedData.reciepientId as string }] : [])
                 ]
               }
             }
           }
         },
         include: {
-          conversation: true
+          StarredMessage: {
+            select: {
+              id: true,
+              profileId: true,
+              messageId: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+          user: true
+          
         }
       });
     }
 
-    if (newMessage) {
-      res.status(200).json({ message: "Message sent", newMessage });
+    const NewMessage = {
+       reciepientId: reciepientId,
+      newMessage: newMessage
+    }
+
+    if (NewMessage) {
+      res.status(200).json(NewMessage );
       return;
     } else {
       res.status(400).json({ error: "Message not sent" });
     }
   } catch (error) {
+
     res.status(500).json({ error: `${error}` });
+    console.error(error)
   }
 };
 

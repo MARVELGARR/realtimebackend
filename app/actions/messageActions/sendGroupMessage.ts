@@ -35,6 +35,18 @@ const sendGroupMessage: RequestHandler = async (
 
         
       },
+      include: {
+        StarredMessage: {
+          select: {
+            id: true,
+            profileId: true,
+            messageId: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+         user: true
+      }
     });
 
     res.status(200).json(groupmessage);
