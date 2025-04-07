@@ -58,7 +58,23 @@ export function initializeSocket(server: any){
     io.on("connection", (socket) => {
         console.log("A user connected:", socket.id);
 
-
+        socket.on("connect", ({ userId, messages }: { userId: string, messages: Record<string, number> }) => {
+            connectedUserIdMap.set(userId, socket.id);
+          
+            if (!userUnreadMessages.has(userId)) {
+              userUnreadMessages.set(userId, new Map());
+            }
+          
+            const userMessages = userUnreadMessages.get(userId);
+          
+            // Rehydrate unread count with empty placeholder messages (optional)
+            Object.entries(messages).forEach(([senderId, count]) => {
+              if (!userMessages?.has(senderId)) {
+                const placeholderMessages = Array(count).fill(null); // or dummy objects if needed
+                userMessages?.set(senderId, placeholderMessages);
+              }
+            });
+          });
         
         socket.on("join-conversation", ({recepientId, userId})=>{
             socket.join(`${recepientId}:${userId}`)
@@ -102,8 +118,6 @@ export function initializeSocket(server: any){
             }
           });
           
-
-
 
 
         //groups
