@@ -50,16 +50,60 @@ interface User {
 export function initializeSocket(server: any){
     io = new Server(server, { cors: corsOptions });
 
+    const userUnreadMessages = new Map<string, Map<string, GroupMessageProp[]>>();
+    const userLastSeen = new Map<string, Date>();
+    const connectedUserIdMap = new Map<string, string>();
+    const connectedUserId = connectedUserIdMap.get("userId") 
+
     io.on("connection", (socket) => {
         console.log("A user connected:", socket.id);
+
+
         
         socket.on("join-conversation", ({recepientId, userId})=>{
             socket.join(`${recepientId}:${userId}`)
         })
-
-        socket.on("send-message", async ({...prop}:sendMessageProp)=>{
-            io.to(`${prop.recepientId}:${prop.newMessage.userId}`).emit("receive-message", { ...prop });
+        socket.on("message-read", ({recepientId, userId})=>{
+            const userMessages = userUnreadMessages.get(userId);
+            if (userMessages) {
+                userMessages.delete(recepientId);
+                if (userMessages.size === 0) {
+                    userUnreadMessages.delete(userId);
+                }
+            }
         })
+
+        socket.on("send-message", async ({ recepientId, newMessage }: sendMessageProp) => {
+            if (!recepientId) return;
+          
+            // 1. Update unread message map for the recipient
+            const recipientMessages = userUnreadMessages.get(recepientId) || new Map();
+            const existingMessages = recipientMessages.get(newMessage.userId) || [];
+          
+            existingMessages.push(newMessage);
+            recipientMessages.set(newMessage.userId, existingMessages);
+            userUnreadMessages.set(recepientId, recipientMessages);
+          
+            const unreadCount = existingMessages.length;
+          
+            // 2. Send the message to the room (for both sender and recipient)
+            const roomName = `${recepientId}:${newMessage.userId}`;
+            io.to(roomName).emit("receive-message", {
+              ...newMessage,
+            });
+          
+            // 3. Emit separate unread notification to the recipient directly
+            const recipientSocketId = connectedUserIdMap.get(recepientId);
+            if (recipientSocketId) {
+              io.to(recipientSocketId).emit("unread-message", {
+                from: newMessage.userId,
+                unreadCount,
+              });
+            }
+          });
+          
+
+
 
 
         //groups
