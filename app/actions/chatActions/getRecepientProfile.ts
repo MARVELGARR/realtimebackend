@@ -46,7 +46,6 @@ const getRecepientProfile: RequestHandler = async (
       },
     });
     if (recepientProfile) {
-        console.log(recepientProfile)
       res.status(200).json(recepientProfile);
     }
     else{
