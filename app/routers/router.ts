@@ -63,7 +63,7 @@ router.get('/searchUsers', authenticateToken, getSearchUsers)
 
 
 //message & conversation routes   
-router.post('/send-message:conversationId', authenticateToken, sendMessage)
+router.post('/send-message:reciepientId', authenticateToken, sendMessage)
 router.delete('/delete-message/:messageId', authenticateToken, deleteMessage)
 router.patch('/update-message/:messageId', authenticateToken)
 router.get( `/conversation-recepientId`,authenticateToken, getConversationWithrecepientId)

@@ -19,7 +19,7 @@ export const getAndFilterChats: RequestHandler = async (
   const skip = (page - 1) * limit;
 
   try {
-    const whereClause: any = searchTerm
+    const whereClause: any = searchTerm && searchTerm.trim() !== "" 
       ? {
           OR: [
             {
@@ -72,7 +72,12 @@ export const getAndFilterChats: RequestHandler = async (
                     blockedId: user.profile?.id,
                   },
                 },
-              },
+                blockedBy: {
+                  none: {
+                    blockerId: user.profile?.id,
+                  },
+                },
+              }
             },
           },
         },
@@ -131,24 +136,25 @@ export const getAndFilterChats: RequestHandler = async (
       },
     });
 
-    const directConversations = conversations.filter(
-      (convo) => convo.participants.length === 2 && !convo.groupId
-    );
+    const directConversations = conversations.filter((convo) => {
+      return !convo.groupId;
+    });
 
     const groupConversations = conversations
-      .filter((convo) => convo.participants.length > 1 && convo.groupId)
-      .map((item) => ({id:item.id, group:item.group}));
+    .filter((convo) => convo.groupId !== null && convo.groupId !== undefined)
+    .map((item) => ({ id: item.id, group: item.group }));
 
-    const friendConvo = directConversations.filter((convo) => !convo.groupId &&
-      convo.participants.find((parti) => parti.userId !== user.userId)?.user.friends.filter((cri)=>{
-        cri.userId === user.userId
-      })
-    );
+    const friendConvo = directConversations.filter((convo) => {
+      // Find the other participant in this conversation
+      const otherParticipant = convo.participants.find(p => p.userId !== user.userId);
+      
+      // Check if this person is a friend of the current user
+      return otherParticipant && otherParticipant.user.friends.some(f => f.friendId === user.userId);
+    });
 
     const favouriteConvo = conversations.filter((convo) =>
       convo.StarConversation.some((star) => star.userId === user.userId)
     );
-
     res.json({
       directConversations,
       groupConversations,

@@ -193,6 +193,7 @@ model Group {
   Conversation Conversation[]
 }
 
+
 model Friend {
   id            String          @id @default(auto()) @map("_id") @db.ObjectId
 
