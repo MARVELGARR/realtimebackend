@@ -15,17 +15,19 @@ const getConversationWithrecepientId: RequestHandler = async( req: Request, res:
         const conversation = await prisma.conversation.findFirst({
             where: {
                 participants: {
-
                     every: {
                         userId: {
                           in: [user.userId as string, recepientId as string]
                         }
                     }
                 },
-
             },
             include: {
                 messages: {
+                    orderBy: {
+                        createdAt: 'desc'
+                    },
+                    take: 1,
                     include: {
                         user: true,
                         StarredMessage: true
@@ -44,7 +46,15 @@ const getConversationWithrecepientId: RequestHandler = async( req: Request, res:
                     },
                     distinct: ['userId'],
                 },
-            
+                unreadStates: {
+                    where: {
+                        userId: user.userId as string
+                    },
+                    select: {
+                        unreadCount: true,
+                        userId: true,
+                    }
+                }
             }
         })
         if(conversation){

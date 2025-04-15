@@ -15,8 +15,6 @@ const sendMessage = async (req: Request, res: Response) => {
   
   const { message } = messageBody as MessageFormData;
   
-
-  
   if (!req.user) {
     res.status(401).json({ error: "Unauthorized" });
     return;
@@ -53,7 +51,7 @@ const sendMessage = async (req: Request, res: Response) => {
       });
       
       if (existingConversation) {
-        // If conversation exists, connect to it
+        // If conversation exists, connect to it and create message
         newMessage = await prisma.message.create({
           data: {
             content: parsedData.message,
@@ -88,52 +86,102 @@ const sendMessage = async (req: Request, res: Response) => {
             user: true
           }
         });
-      } else {
-        // If no conversation exists, create a new one
-        newMessage = await prisma.message.create({
-          data: {
-            content: parsedData.message,
-            user: {
-              connect: {
-                id: user.userId
-              }
-            },
-            type: "DIRECT",
-            editableUntil: editExpire,
-            conversation: {
-              create: {
-                participants: {
-                  create: [
-                    { userId: user.userId },
-                    { userId: reciepientId }
-                  ]
-                }
-              }
+        
+        // Update unread state for the recipient
+        await prisma.unreadMessage.upsert({
+          where: {
+            // Assuming you have a unique constraint on conversationId and userId
+            // If not, you'll need to adjust this query
+            conversationId_userId: {
+              conversationId: existingConversation.id,
+              userId: reciepientId
             }
           },
-          include: {
-            
-            conversation: {
-              select: {
-                id: true
+          update: {
+            unreadCount: {
+              increment: 1
+            }
+          },
+          create: {
+            conversationId: existingConversation.id,
+            userId: reciepientId,
+            unreadCount: 1
+          }
+        });
+      } else {
+        // If no conversation exists, create a new one with message
+        newMessage = await prisma.$transaction(async (tx) => {
+          // Create conversation with participants
+          const conversation = await tx.conversation.create({
+            data: {
+              participants: {
+                create: [
+                  { userId: user.userId },
+                  { userId: reciepientId }
+                ]
+              }
+            }
+          });
+          
+          // Create message in the new conversation
+          const message = await tx.message.create({
+            data: {
+              content: parsedData.message,
+              user: {
+                connect: {
+                  id: user.userId
+                }
+              },
+              type: "DIRECT",
+              editableUntil: editExpire,
+              conversation: {
+                connect: {
+                  id: conversation.id
+                }
               }
             },
-            StarredMessage: {
-              select: {
-                id: true,
-                profileId: true,
-                messageId: true,
-                createdAt: true,
-                updatedAt: true,
+            include: {
+              conversation: {
+                select: {
+                  id: true
+                }
               },
-            },
-            user: true
-          }
+              StarredMessage: {
+                select: {
+                  id: true,
+                  profileId: true,
+                  messageId: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              },
+              user: true
+            }
+          });
+          
+          // Initialize unread state for recipient
+          await tx.unreadMessage.create({
+            data: {
+              conversationId: conversation.id,
+              userId: reciepientId,
+              unreadCount: 1
+            }
+          });
+          
+          // Initialize read state for sender (0 unread)
+          await tx.unreadMessage.create({
+            data: {
+              conversationId: conversation.id,
+              userId: user.userId,
+              unreadCount: 0
+            }
+          });
+          
+          return message;
         });
       }
     } else {
       // Handle group message or other cases without recipient
-      // For now, return an error as direct messages need a recipient
       res.status(400).json({ error: "Recipient ID is required for direct messages" });
       return;
     }
@@ -150,8 +198,13 @@ const sendMessage = async (req: Request, res: Response) => {
       res.status(400).json({ error: "Message not sent" });
     }
   } catch (error) {
-    res.status(500).json({ error: `${error}` });
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("Error sending message:", error.message);
+      res.status(500).json({ error: error.message });
+    } else {
+      console.error("Unknown error:", error);
+      res.status(500).json({ error: "An unknown error occurred" });
+    }
   }
 };
 

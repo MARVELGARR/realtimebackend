@@ -36,6 +36,7 @@ import deleteGroupMessages from '../actions/messageActions/deleteGroupMessages';
 import deleteGroupMessage from '../actions/groupActions/deleteGroupMessage';
 import getGroupMessages from '../actions/groupActions/getGroupMessages';
 import getMessages from '../actions/messageActions/getMessages';
+import readMessage from '../actions/chatActions/readMessage';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -76,7 +77,7 @@ router.post(`/delete-messages`, authenticateToken, deleteMessages)
 
 //chat routes
 router.get('/get-recepient-profile/:recepientId', authenticateToken, getRecepientProfile)
-
+router.get("/read-message/:conversationId", authenticateToken, readMessage)
 
 // user interActions
 router.post('/add-friend', authenticateToken, addFriend)

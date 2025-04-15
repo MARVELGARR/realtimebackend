@@ -109,6 +109,15 @@ export const getAndFilterChats: RequestHandler = async (
           orderBy: { createdAt: "desc" },
           include: { user: { select: { id: true, name: true } } },
         },
+        unreadStates: {
+          where: {
+              userId: user.userId as string
+          },
+          select: {
+              unreadCount: true,
+              userId: true,
+          }
+      },
         group: true,
         StarConversation: true,
       },
@@ -148,7 +157,7 @@ export const getAndFilterChats: RequestHandler = async (
       // Find the other participant in this conversation
       const otherParticipant = convo.participants.find(p => p.userId !== user.userId);
       
-      // Check if this person is a friend of the current user
+      // Check if this person  is a friend of the current user
       return otherParticipant && otherParticipant.user.friends.some(f => f.friendId === user.userId);
     });
 
