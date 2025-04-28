@@ -3,6 +3,7 @@ import { Response, Request, RequestHandler} from "express"
 import bcrypt from 'bcrypt';
 import { createSessionForUser } from "./createSession";
 import { prisma } from "../../configs/prisma";
+import { LastSeen } from "@prisma/client";
 
 type loginUserProp ={
     email: string
@@ -70,7 +71,21 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
         const sessionID = await createSessionForUser(user!)
 
      
-
+        const ResponseUser = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            profile: {
+                bio: user.profile?.bio,
+                birthDay: user.profile?.birthDay,
+                nickname: user.profile?.nickname,
+                phoneNumber: user.profile?.phoneNumber,
+                LastSeen: user.profile?.privacy?.lastSeen as LastSeen,
+                sex: user.profile?.gender
+                
+            }
+        }
         res.cookie('sessionID', sessionID.sessionId, {
             httpOnly: true,
             secure: true,
@@ -81,7 +96,7 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
 
         res.status(200).json({
             message: "Login successful",
-            user: user,
+            user: ResponseUser,
             sessionId: sessionID?.sessionId,
         })
         return

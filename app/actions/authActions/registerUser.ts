@@ -15,7 +15,7 @@ type RegisterUserRequest = {
     email: string;
     password: string;
     gender: Gender 
-    birthday: string; 
+
 };
 
 const domain = process.env.ENV 
@@ -32,7 +32,6 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
         email,
         password,
         gender,
-        birthday
     } :RegisterUserRequest = req.body;
 
     const missingField = !firstname ? 'firstname' :
@@ -91,10 +90,9 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
                         bio: "",
                         firstName: firstname,
                         lastName: lastname,
-                        birthDay: new Date(birthday),
                         gender: Genda(gender),
                         phoneNumber: phoneNumber,    
-    
+                        birthDay: undefined
                     }
                 }
             },
@@ -137,6 +135,11 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
        
            res.status(200).json({
                message: "User registered successfully",
+                user: {
+                   name:  newUser.name,
+                   email: newUser.email,
+
+                },
                sessionId: sessionId?.sessionId,
            });
         }
