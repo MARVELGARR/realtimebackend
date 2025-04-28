@@ -82,7 +82,7 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
                 nickname: user.profile?.nickname,
                 phoneNumber: user.profile?.phoneNumber,
                 LastSeen: user.profile?.privacy?.lastSeen as LastSeen,
-                sex: user.profile?.gender
+                gender: user.profile?.gender
                 
             }
         }
@@ -95,9 +95,7 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
         });
 
         res.status(200).json({
-            message: "Login successful",
-            user: ResponseUser,
-            sessionId: sessionID?.sessionId,
+
         })
         return
 
