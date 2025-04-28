@@ -81,7 +81,7 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
                 birthDay: user.profile?.birthDay,
                 nickname: user.profile?.nickname,
                 phoneNumber: user.profile?.phoneNumber,
-                LastSeen: user.profile?.privacy?.lastSeen as LastSeen,
+                lastSeen: user.profile?.privacy?.lastSeen as LastSeen,
                 gender: user.profile?.gender
                 
             }
