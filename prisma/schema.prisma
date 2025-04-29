@@ -20,7 +20,10 @@ model User {
   messages      Message[]
   conversations ConversationParticipant[]
   createdGroups Group[]              @relation("GroupCreator")
-  friends       Friend[]             
+
+  sentRequests     FriendRequest[] @relation("SentRequests")
+  receivedRequests FriendRequest[] @relation("ReceivedRequests")
+             
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -29,11 +32,16 @@ model User {
 
   StarConversation StarConversation[]
 
-  Friend Friend[] @relation("FriendAdded")
 
   Group Group[] @relation("GroupAdmin")
 
   UnreadMessage UnreadMessage[]
+
+
+
+  friendshipsInitiated Friendship[] @relation("UserFriendship2")
+
+  friendshipsReceived   Friendship[] @relation("UserFriendship1")
 }
 
 model Account {
@@ -93,7 +101,7 @@ model Profile {
   profilePicture String?
   userId    String   @db.ObjectId @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  coverPicture String?
   blockedUsers  Block[]  @relation("Blocker")
   blockedBy     Block[]  @relation("Blocked")
   privacy Privacy?
@@ -209,22 +217,34 @@ model Group {
   Conversation Conversation[]
 }
 
-
-model Friend {
+model FriendRequest {
   id            String          @id @default(auto()) @map("_id") @db.ObjectId
 
+  senderId   String   @db.ObjectId
+  receiverId String   @db.ObjectId
+
+  sender     User     @relation("SentRequests", fields: [senderId], references: [id])
+  receiver   User     @relation("ReceivedRequests", fields: [receiverId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt    DateTime @default(now())
+
+}
+model Friendship  {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+
+  user1Id       String   @db.ObjectId
+  user2Id       String   @db.ObjectId
+
+  user1         User     @relation("UserFriendship1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2         User     @relation("UserFriendship2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
 
-  // Relations
-  userId       String   @db.ObjectId
-  user         User     @relation( fields: [userId], references: [id], onDelete: Cascade)
-
-  friendId String   @db.ObjectId
-  friend User @relation( "FriendAdded", fields: [friendId], references: [id], onDelete: Cascade)
   
 
-  @@unique([userId])
+  @@unique([user1Id, user2Id])
 }
 
 model Block {

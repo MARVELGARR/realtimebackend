@@ -4,6 +4,7 @@ import { prisma } from '../../configs/prisma';
 import { NewOauthUserType } from './creatOauthUser';
 
 export interface SessionPayload {
+
   userId: string;
   email: string | null;
   name: string | null;

@@ -8,7 +8,8 @@ import { forgotPassword } from '../actions/authActions/forgotPassword';
 import { googleAuth, googleCallback } from '../actions/authActions/google';
 import registerUser from '../actions/authActions/registerUser';
 import { loginUser } from '../actions/authActions/loginUser';
-
+import { upload } from '../middleware/multer';
+import singleFileUpload from '../actions/fileUploader/fileUpload';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -25,6 +26,7 @@ router.get("/verifying-reset-password", verifyResetPassword)
 router.post('/reset-password', resetPassword)
 
 
-
+//file upload 
+router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
 
 export default router;
