@@ -15,20 +15,11 @@ const singleFileUpload: RequestHandler = async (req: Request, res: Response) => 
       req.file.mimetype
     };base64,${req.file.buffer.toString("base64")}`;
 
-    const timestamp = Math.floor(Date.now() / 1000);
-
-    const paramsToSign = {
-      folder: "uploads",
-      timestamp
-    };
-
-    const signature = generateSignature(paramsToSign, process.env.CLOUDINARY_API_SECRET!);
+    
 
     // Upload file to Cloudinary
     const result = await cloudinary.uploader.upload(base64String, {
       folder: "uploads", // Cloudinary folder
-      timestamp,
-      signature,
       resource_type: "auto", // Auto-detect file type
     });
 
@@ -54,7 +45,3 @@ const singleFileUpload: RequestHandler = async (req: Request, res: Response) => 
 };
 
 export default singleFileUpload;
-
-function generateSignature(paramsToSign: { folder: string; timestamp: number; }, arg1: string) {
-    throw new Error("Function not implemented.");
-}
