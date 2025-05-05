@@ -10,6 +10,8 @@ import registerUser from '../actions/authActions/registerUser';
 import { loginUser } from '../actions/authActions/loginUser';
 import { upload } from '../middleware/multer';
 import singleFileUpload from '../actions/fileUploader/fileUpload';
+import update_profile from '../actions/userActions/updateProfile';
+import updatePrivacy from '../actions/userActions/updatePrivacy';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -28,5 +30,9 @@ router.post('/reset-password', resetPassword)
 
 //file upload 
 router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
+
+// user management
+router.patch('/update-profile', authenticateToken, update_profile)
+router.patch("/update-privacy", authenticateToken, updatePrivacy)
 
 export default router;

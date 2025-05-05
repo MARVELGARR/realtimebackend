@@ -119,7 +119,7 @@ model Message {
 
   // Relations
   userId         String       @db.ObjectId
-  user           User         @relation(fields: [userId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   conversationId String       @db.ObjectId 
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   editableUntil DateTime  @default(now())
@@ -152,6 +152,7 @@ model Conversation {
   groupId        String?      @db.ObjectId
   group          Group?       @relation(fields: [groupId], references: [id])
 
+  conversationType ChatType @default(DIRECT)
   StarConversation StarConversation[]
   unreadStates UnreadMessage[] 
 }

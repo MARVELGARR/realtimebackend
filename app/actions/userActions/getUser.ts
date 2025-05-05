@@ -16,7 +16,11 @@ const getUser: RequestHandler = async(req: Request, res: Response) => {
                 id: user?.userId
             },
             include: {
-                profile: true
+                profile: {
+                    include: {
+                        privacy: true
+                    }
+                }
             }
 
         })

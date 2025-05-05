@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { createSessionForUser } from './createSession';
-import { Gender } from '@prisma/client';
+import { DisappearingMessages, Gender, LastSeen, Precense } from '@prisma/client';
 import dotenv from 'dotenv';
 import { prisma } from '../../configs/prisma';
 import { read } from 'fs';
@@ -92,7 +92,15 @@ const registerUser: RequestHandler = async ( req: Request, res: Response) => {
                         lastName: lastname,
                         gender: Genda(gender),
                         phoneNumber: phoneNumber,    
-                        birthDay: undefined
+                        birthDay: undefined,
+                        privacy: {
+                            create: {
+                                disappearingMessages: DisappearingMessages.OFF,
+                                lastSeen: LastSeen.EVERYONE,
+                                precense: Precense.EVERYONE,
+                                readReciept: true,
+                            }
+                        }
                     }
                 }
             },
