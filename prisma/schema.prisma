@@ -233,8 +233,8 @@ model FriendRequest {
 model Friendship  {
   id            String          @id @default(auto()) @map("_id") @db.ObjectId
 
-  user1Id       String   @db.ObjectId
-  user2Id       String   @db.ObjectId
+  user1Id       String   @db.ObjectId @unique
+  user2Id       String   @db.ObjectId @unique
 
   user1         User     @relation("UserFriendship1", fields: [user1Id], references: [id], onDelete: Cascade)
   user2         User     @relation("UserFriendship2", fields: [user2Id], references: [id], onDelete: Cascade)

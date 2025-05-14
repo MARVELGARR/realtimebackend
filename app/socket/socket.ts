@@ -61,51 +61,32 @@ export function initializeSocket(server: any) {
   io = new Server(server, { cors: corsOptions });
 
 
+  const onlineUsers = new Map<string, string>()
   io.on("connection", (socket) => {
-    console.log("A user connected:", socket.id);
+    
+    socket.on("user-connected",(userId: string)=>{
+      onlineUsers.set(socket.id, userId)
+
+      //Informs the loggedin user he/she is online
+      socket.emit('isOnline', {isOnline: true})
+      const onlineUserIds = Array.from(onlineUsers.values());
+      
+      io.emit("online-users", onlineUserIds )
+    })
+    
+
+    
+
 
     socket.onAny((event, ...args) => {
       console.log(`📩 Event received: ${event}`, args);
     });
 
-    socket.on("join-conversation", ({ roomId}) => {
-      socket.join(roomId);
-      
-      console.log(`👥 User joined room: ${roomId}`);
-    });
-
-    socket.on(
-      "send-message",
-      ({ roomId, newMessage }: { roomId: string; newMessage: MessageProp }) => {
-        io.to(roomId).emit("receive-message", newMessage);
-        console.log(`📤 Sent message to room ${roomId}: ${newMessage.content}`);
-      }
-    );
-
-    //groups
-
-    socket.on(
-      "join-group-conversation",
-      ({ conversationId, groupId, userId }) => {
-        socket.join(conversationId);
-        console.log(userId, "Joined");
-      }
-    );
-
-    socket.on("send-group-message", async ({ ...prop }: GroupMessageProp) => {
-      console.log(
-        `Sending message to conversation ${prop.conversationId}: ${prop.content}`
-      );
-
-      io.to(prop.conversationId).emit("receive-group-message", { ...prop });
-
-      // Save message to database
-    });
 
     socket.on("disconnect", () => {
-      console.log("User disconnected: ", socket.id);
+      
+      onlineUsers.delete(socket.id);
+      io.emit("online-users", Array.from(onlineUsers.values()));
     });
-
-
   });
 }

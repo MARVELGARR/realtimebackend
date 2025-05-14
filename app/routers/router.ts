@@ -12,6 +12,12 @@ import { upload } from '../middleware/multer';
 import singleFileUpload from '../actions/fileUploader/fileUpload';
 import update_profile from '../actions/userActions/updateProfile';
 import updatePrivacy from '../actions/userActions/updatePrivacy';
+import getConversations from '../actions/conversationActions/getConversations';
+import getUser from '../actions/userActions/getUser';
+import getUsers from '../actions/usersActions/getUsers';
+import getFriendsRequest from '../actions/friendActions/getFriendRequests';
+import acceptFriendRequest from "../actions/friendActions/acceptFriendRequest"
+import getMyFriends from '../actions/friendActions/getMyFriends';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -34,5 +40,16 @@ router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
 // user management
 router.patch('/update-profile', authenticateToken, update_profile)
 router.patch("/update-privacy", authenticateToken, updatePrivacy)
+
+//users
+router.get('/users', authenticateToken, getUsers)
+router.get('/my-friends', authenticateToken, getMyFriends)
+
+// friend request
+router.get('/friend-requests', authenticateToken,  getFriendsRequest)
+router.post("/confirmFriendRequest", authenticateToken, acceptFriendRequest)
+
+//conversations
+router.get('/conversations', authenticateToken, getConversations)
 
 export default router;
