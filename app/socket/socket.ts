@@ -74,8 +74,12 @@ export function initializeSocket(server: any) {
       io.emit("online-users", onlineUserIds )
     })
     
-
     
+    socket.on("join-conversation", (conversationId: string) => {
+  socket.join(conversationId);
+  console.log(`User ${socket.id} joined conversation ${conversationId}`);
+});
+
 
 
     socket.onAny((event, ...args) => {

@@ -13,6 +13,8 @@ const getConversations: RequestHandler = async (
   }
   const { limit, offset, searchTerm = "" } = req.query;
 
+  
+
   const [conversations, totalCount] = await Promise.all([
     prisma.conversation.findMany({
       skip: Number(offset) || 0,
@@ -23,6 +25,7 @@ const getConversations: RequestHandler = async (
             userId: user.userId,
           },
         },
+        
         OR: [
           {
             participants: {
