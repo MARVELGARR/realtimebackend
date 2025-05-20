@@ -28,6 +28,8 @@ const getMessages: RequestHandler = async (req: Request, res: Response) => {
             where: {
                 conversationId
             },
+            orderBy: {
+                createdAt: "desc"}
     
         }),
         prisma.message.count({

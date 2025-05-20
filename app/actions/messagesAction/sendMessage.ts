@@ -1,14 +1,22 @@
-import { Request, RequestHandler, Response } from "express";
+
 import { prisma } from "../../configs/prisma";
 
-const sndMessage: RequestHandler = async (req: Request, res: Response) => {
-  const user = req.user;
+const sendMessage = async (
+    {
+        conversationId,
+      conversationType,
+      message,
+      receiverId,
+      currentUserId
+    }: {
+         conversationId?: string;
+      conversationType: "DIRECT" | "GROUP";
+      message: string;
+      receiverId: string;
+      currentUserId: string;
+    }
+) => {
 
-  if (!user) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
-  }
-  const { conversationType, message, receiverId, conversationId } = req.body;
   try {
     if (!conversationId) {
       const data = await prisma.$transaction(async (tx) => {
@@ -17,30 +25,39 @@ const sndMessage: RequestHandler = async (req: Request, res: Response) => {
             conversationType,
             participants: {
               createMany: {
-                data: [{ userId: user.userId }, { userId: receiverId }],
+                data: [{ userId: currentUserId }, { userId: receiverId }],
               },
             },
           },
         });
 
         const newMessage = await tx.message.create({
-          data: {
+          data: { 
             content: message,
-            userId: user.userId,
+            userId: currentUserId,
             conversationId: conversation.id,
           },
         });
 
         return { conversation, newMessage };
-      });
-      res.status(201).json(data);
+      })
     } else {
+        const newMessage = await prisma.message.create({
+            data: {
+                content: message,
+                userId: currentUserId,
+                conversationId
+            }
+        })
+        if(!newMessage){
+            throw new Error("Message not sent")
+        }
+        return newMessage
     }
   } catch (error) {
     console.error("Error sending message:", error);
-    res.status(500).json({ message: "Internal server error" });
-    return;
+
   }
 };
 
-export default sndMessage;
+export default sendMessage;

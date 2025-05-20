@@ -2,7 +2,9 @@ import { Server } from "socket.io";
 import dotenv from "dotenv";
 import http from "http";
 import corsOptions from "../configs/cors";
-
+import sendMessageHandler from "./socketHandlers/send-message-handler";
+import SocketDeleteSingleMessage from "./socketHandlers/delete-single-message-handler";
+import deleteMultipleMessageSocket from "./socketHandlers/delete-multiple-messages-handlers";
 dotenv.config();
 export let io: Server;
 
@@ -60,35 +62,33 @@ export type sendMessageProp = {
 export function initializeSocket(server: any) {
   io = new Server(server, { cors: corsOptions });
 
-
-  const onlineUsers = new Map<string, string>()
+  const onlineUsers = new Map<string, string>();
   io.on("connection", (socket) => {
-    
-    socket.on("user-connected",(userId: string)=>{
-      onlineUsers.set(socket.id, userId)
+    socket.on("user-connected", (userId: string) => {
+      onlineUsers.set(socket.id, userId);
 
       //Informs the loggedin user he/she is online
-      socket.emit('isOnline', {isOnline: true})
+      socket.emit("isOnline", { isOnline: true });
       const onlineUserIds = Array.from(onlineUsers.values());
-      
-      io.emit("online-users", onlineUserIds )
-    })
-    
-    
+
+      io.emit("online-users", onlineUserIds);
+    });
+
     socket.on("join-conversation", (conversationId: string) => {
-  socket.join(conversationId);
-  console.log(`User ${socket.id} joined conversation ${conversationId}`);
-});
+      socket.join(conversationId);
+      console.log(`User ${socket.id} joined conversation ${conversationId}`);
+    });
 
 
+    sendMessageHandler(socket, io)
+    SocketDeleteSingleMessage(socket, io)
+    deleteMultipleMessageSocket(socket, io)
 
     socket.onAny((event, ...args) => {
       console.log(`📩 Event received: ${event}`, args);
     });
 
-
-    socket.on("disconnect", () => {
-      
+    socket.on("disconnect", () => { 
       onlineUsers.delete(socket.id);
       io.emit("online-users", Array.from(onlineUsers.values()));
     });
