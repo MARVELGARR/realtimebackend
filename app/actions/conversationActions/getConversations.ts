@@ -19,37 +19,39 @@ const getConversations: RequestHandler = async (
     prisma.conversation.findMany({
       skip: Number(offset) || 0,
       take: Number(limit) || 10,
-      where: {
-        participants: {
-          some: {
-            userId: user.userId,
+where: {
+  participants: {
+    some: {
+      
+      userId: user.userId,
+    },
+  },
+  conversationType: { in: ["DIRECT", "GROUP"] }, // Only needed if you want to be explicit
+  OR: [
+    {
+      participants: {
+        some: {
+          user: {
+            name: {
+              contains: searchTerm as string,
+              mode: "insensitive",
+            },
           },
         },
-        
-        OR: [
-          {
-            participants: {
-              some: {
-                user: {
-                  name: {
-                    contains: searchTerm as string,
-                    mode: "insensitive",
-                  },
-                },
-              },
-            },
-          },
-          {
-            group: {
-              name: {
-                contains: searchTerm as string,
-                mode: "insensitive",
-              },
-            },
-          },
-        ],
       },
+    },
+    {
+      group: {
+        name: {
+          contains: searchTerm as string,
+          mode: "insensitive",
+        },
+      },
+    },
+  ],
+},
       include: {
+        group:true,
         unreadStates: {
           select: {
             unreadCount: true,

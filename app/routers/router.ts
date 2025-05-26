@@ -21,6 +21,8 @@ import getMyFriends from '../actions/friendActions/getMyFriends';
 import getConvoDetails from '../actions/chatActions/getConvoDetails';
 import getMessages from '../actions/chatActions/getMessages';
 import sendMessage from '../actions/messagesAction/sendMessage';
+import getFriends from '../actions/userActions/getFriends';
+import createNewGroup from '../actions/groupActions/createNewGroup';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -47,6 +49,7 @@ router.patch("/update-privacy", authenticateToken, updatePrivacy)
 //users
 router.get('/users', authenticateToken, getUsers)
 router.get('/my-friends', authenticateToken, getMyFriends)
+router.get("/friends", authenticateToken, getFriends)
 
 // friend request
 router.get('/friend-requests', authenticateToken,  getFriendsRequest)
@@ -57,6 +60,7 @@ router.get('/conversations', authenticateToken, getConversations)
 router.get('/convo-details/:conversationId', authenticateToken, getConvoDetails)
 router.get('/messages/:conversationId', authenticateToken, getMessages)
 
-
+//group
+router.post('/createNewGroup', authenticateToken, createNewGroup)
 
 export default router;
