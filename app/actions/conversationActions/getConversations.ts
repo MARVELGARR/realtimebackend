@@ -55,6 +55,7 @@ where: {
         unreadStates: {
           select: {
             unreadCount: true,
+            userId: true,
             lastReadAt: true,
           },
         },

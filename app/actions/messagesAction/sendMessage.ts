@@ -1,62 +1,95 @@
-
 import { prisma } from "../../configs/prisma";
 
-const sendMessage = async (
-    {
-        conversationId,
-      conversationType,
-      message,
-      receiverId,
-      currentUserId
-    }: {
-         conversationId?: string;
-      conversationType: "DIRECT" | "GROUP";
-      message: string;
-      receiverId: string;
-      currentUserId: string;
-    }
-) => {
+type SendMessageParams = {
+  conversationId?: string;
+  conversationType: "DIRECT" | "GROUP";
+  message: string;
+  receiverId: string;
+  currentUserId: string;
+};
 
+const sendMessage = async ({
+  conversationId,
+  conversationType,
+  message,
+  receiverId,
+  currentUserId,
+}: SendMessageParams) => {
   try {
-    if (!conversationId) {
-      const data = await prisma.$transaction(async (tx) => {
-        const conversation = await prisma.conversation.create({
-          data: {
-            conversationType,
-            participants: {
-              createMany: {
-                data: [{ userId: currentUserId }, { userId: receiverId }],
-              },
-            },
-          },
-        });
+if (!conversationId) {
+  // Conversation creation logic...
+} else {
+  const newMessage = await prisma.message.create({
+    data: {
+      content: message,
+      userId: currentUserId,
+      conversationId,
+    },
+  });
 
-        const newMessage = await tx.message.create({
-          data: { 
-            content: message,
-            userId: currentUserId,
-            conversationId: conversation.id,
-          },
-        });
+  if (!newMessage) throw new Error("Message not sent");
 
-        return { conversation, newMessage };
+  if (conversationType === "GROUP") {
+  // Fetch all participants in the group except the sender
+  const groupParticipants = await prisma.conversationParticipant.findMany({
+    where: {
+      conversationId,
+      NOT: { userId: currentUserId },
+    },
+    select: { userId: true },
+  });
+
+  await Promise.all(
+    groupParticipants.map(({ userId }) =>
+      prisma.unreadMessage.upsert({
+        where: {
+          conversationId_userId: {
+            conversationId,
+            userId,
+          },
+        },
+        update: {
+          unreadCount: {
+            increment: 1,
+          },
+        },
+        create: {
+          conversationId,
+          userId,
+          unreadCount: 1,
+        },
       })
-    } else {
-        const newMessage = await prisma.message.create({
-            data: {
-                content: message,
-                userId: currentUserId,
-                conversationId
-            }
-        })
-        if(!newMessage){
-            throw new Error("Message not sent")
-        }
-        return newMessage
-    }
+    )
+  );
+} else {
+  // DIRECT message unread update
+  await prisma.unreadMessage.upsert({
+    where: {
+      conversationId_userId: {
+        conversationId,
+        userId: receiverId!,
+      },
+    },
+    update: {
+      unreadCount: {
+        increment: 1,
+      },
+    },
+    create: {
+      conversationId,
+      userId: receiverId!,
+      unreadCount: 1,
+    },
+  });
+}
+
+
+  return newMessage;
+}
+
   } catch (error) {
     console.error("Error sending message:", error);
-
+    throw new Error("Failed to send message");
   }
 };
 

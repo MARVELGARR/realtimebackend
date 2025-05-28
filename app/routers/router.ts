@@ -23,6 +23,7 @@ import getMessages from '../actions/chatActions/getMessages';
 import sendMessage from '../actions/messagesAction/sendMessage';
 import getFriends from '../actions/userActions/getFriends';
 import createNewGroup from '../actions/groupActions/createNewGroup';
+import readMessage from '../actions/messagesAction/readMessage';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -59,7 +60,7 @@ router.post("/confirmFriendRequest", authenticateToken, acceptFriendRequest)
 router.get('/conversations', authenticateToken, getConversations)
 router.get('/convo-details/:conversationId', authenticateToken, getConvoDetails)
 router.get('/messages/:conversationId', authenticateToken, getMessages)
-
+router.get('/read-message/:conversationId', authenticateToken, readMessage)
 //group
 router.post('/createNewGroup', authenticateToken, createNewGroup)
 
