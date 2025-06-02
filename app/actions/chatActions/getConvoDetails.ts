@@ -45,6 +45,10 @@ const getConvoDetails: RequestHandler = async (req: Request, res: Response) => {
                         groupImage: true,
                         descriptions: true,
                         adminId: true,
+                        disappearingMessages: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        
                     }
                 }
             }

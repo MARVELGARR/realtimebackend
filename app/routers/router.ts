@@ -24,6 +24,7 @@ import sendMessage from '../actions/messagesAction/sendMessage';
 import getFriends from '../actions/userActions/getFriends';
 import createNewGroup from '../actions/groupActions/createNewGroup';
 import readMessage from '../actions/messagesAction/readMessage';
+import updateGroupSetting from '../actions/groupActions/updateGroup';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -63,5 +64,6 @@ router.get('/messages/:conversationId', authenticateToken, getMessages)
 router.get('/read-message/:conversationId', authenticateToken, readMessage)
 //group
 router.post('/createNewGroup', authenticateToken, createNewGroup)
+router.post("/update-group-settings/:groupId", authenticateToken, updateGroupSetting)
 
 export default router;
