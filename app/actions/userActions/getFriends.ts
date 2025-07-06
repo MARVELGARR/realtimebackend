@@ -1,5 +1,8 @@
 import { Request, RequestHandler, Response } from "express";
 import { prisma } from "../../configs/prisma";
+import { Prisma } from "@prisma/client";
+
+
 
 const getFriends: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
@@ -10,62 +13,57 @@ const getFriends: RequestHandler = async (req: Request, res: Response): Promise<
   const { limit, offset, searchTerm = "" } = req.query;
   const userId = req.user.userId;
 
+  const nameFilter = searchTerm
+  ? {
+      is: {
+        name: {
+          contains: searchTerm as string,
+          mode: Prisma.QueryMode.insensitive
+        },
+      },
+    }
+  : undefined;
+
   try {
     const friendships = await prisma.friendship.findMany({
+      skip: Number(offset) || 0,
+      take: Number(limit) || 10,
       where: {
         OR: [
-          {
-            user1Id: userId,
-            user2: {
-              name: {
-                contains: searchTerm as string,
-                mode: "insensitive",
-              },
-            },
-          },
-          {
-            user2Id: userId,
-            user1: {
-              name: {
-                contains: searchTerm as string,
-                mode: "insensitive",
-              },
-            },
-          },
-        ],
+          { user1Id: userId, user1: nameFilter },
+          { user2Id: userId, user2: nameFilter }
+        ]
       },
-      select: {
-        user1Id: true,
-        user2Id: true,
+      include: {
         user1: {
           select: {
             id: true,
-            name: true,
-            email: true,
-            image: true,
-            profile: {
-              select: {
-                profilePicture: true,
-              },
-            },
-          },
+             name: true,
+             email: true,
+             image: true,
+             profile: {
+                select: {
+                    profilePicture: true,
+                    bio: true
+                }
+             }
+        }
         },
         user2: {
           select: {
             id: true,
-            name: true,
-            email: true,
-            image: true,
-            profile: {
-              select: {
-                profilePicture: true,
-              },
-            },
-          },
-        },
-      },
-      take: Number(limit) || 10,
-      skip: Number(offset) || 0,
+             name: true,
+             email: true,
+             image: true,
+             profile: {
+                select: {
+                    profilePicture: true,
+                    bio: true
+                }
+             }
+        }
+        }
+      }
     });
 
     // Normalize to always return the other user (not the logged-in user)
@@ -78,25 +76,17 @@ const getFriends: RequestHandler = async (req: Request, res: Response): Promise<
         OR: [
           {
             user1Id: userId,
-            user2: {
-              name: {
-                contains: searchTerm as string,
-                mode: "insensitive",
-              },
-            },
+            user2: nameFilter
           },
           {
             user2Id: userId,
-            user1: {
-              name: {
-                contains: searchTerm as string,
-                mode: "insensitive",
-              },
-            },
+            user1: nameFilter
           },
         ],
       },
     });
+
+
     res.status(200).json({ friends, totalCount });
     return;
   } catch (error) {

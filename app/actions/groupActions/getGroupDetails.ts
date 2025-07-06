@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 import { prisma } from "../../configs/prisma";
 
-const getGroupDetails = async (req: Request, res: Response) => {
+const getGroupDetails: RequestHandler = async (req: Request, res: Response) => {
   const user = req.user;
   if (!user) {
     res.status(401).json({ message: "Unauthorized" });
@@ -20,7 +20,9 @@ const getGroupDetails = async (req: Request, res: Response) => {
       },
       include: {
         participants: {
+
           select: {
+
             user: {
               select: {
                 id: true,

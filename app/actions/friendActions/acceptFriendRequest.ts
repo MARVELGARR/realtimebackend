@@ -10,13 +10,34 @@ const acceptFriendRequest: RequestHandler = async (
     return;
   }
 
+  
   const { requestId, senderId } = req.body;
+
   if (!senderId) {
-    res.status(404).json({ message: "user 2 id is missing" });
+    res.status(400).json({ message: "Sender ID is required" });
     return;
   }
 
+  if (!requestId) {
+    res.status(400).json({ message: "Request ID is required" });
+    return;
+  }
+
+  
+
+
   try {
+    const friendRequest = await prisma.friendRequest.findUnique({
+      where: { id: requestId },
+    });
+    if (!friendRequest) {
+      res.status(404).json({ message: "Friend request not found" });
+      return;
+    }
+    if (friendRequest.receiverId !== user.userId) {
+      res.status(401).json({ message: "Unauthorized to accept this friend request" });
+      return;
+    }
     const existing = await prisma.friendship.findFirst({
       where: {
         OR: [
@@ -30,11 +51,12 @@ const acceptFriendRequest: RequestHandler = async (
       throw new Error("Friendship already exists.");
     }
 
+    const [user1Id, user2Id] = [user.userId, senderId].sort();
     const data = await prisma.$transaction(async (prisma) => {
       const friendship = await prisma.friendship.create({
         data: {
-          user1Id: user.userId,
-          user2Id: senderId,
+          user1Id,
+          user2Id
         },
       });
       await prisma.friendRequest.delete({

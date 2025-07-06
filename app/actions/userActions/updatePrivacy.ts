@@ -24,9 +24,9 @@ const updatePrivacy: RequestHandler = async (req: Request, res: Response) => {
     },
   });
 
-  const data = await prisma.privacy.update({
+  const data = await prisma.privacy.upsert({
     where: { profileId: userProfile?.id },
-    data: {
+    update: {
       disappearingMessages:
         disappearingMessages !== undefined
           ? DSM(disappearingMessages)
@@ -35,6 +35,19 @@ const updatePrivacy: RequestHandler = async (req: Request, res: Response) => {
       readReciept:
         typeof readReciept === "boolean" ? readReciept : undefined,
       precense: precense !== undefined ? PRS(precense) : undefined,
+    },
+    create: {
+      disappearingMessages:
+        disappearingMessages !== undefined
+          ? DSM(disappearingMessages)
+          : undefined,
+      lastSeen: lastSeen !== undefined ? LS(lastSeen) : undefined,
+      readReciept:
+        typeof readReciept === "boolean" ? readReciept : undefined,
+      precense: precense !== undefined ? PRS(precense) : undefined,
+      profile: {
+        connect: { id: userProfile?.id },
+      },
     },
   });
   

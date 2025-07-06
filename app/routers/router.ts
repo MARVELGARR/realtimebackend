@@ -28,6 +28,14 @@ import updateGroupSetting from '../actions/groupActions/updateGroup';
 import getParticipantProfile from '../actions/chatActions/participanProfile';
 import getGroupDetails from '../actions/groupActions/getGroupDetails';
 import sendFriendRequest from '../actions/friendActions/sendFriendRequest';
+import addParticipant from '../actions/groupActions/addParticipant';
+import getUsersProfile from '../actions/usersActions/getUsersProfile';
+import removeParticipant from '../actions/groupActions/removeParticipant';
+import blockUser from '../actions/userActions/blockUser';
+import getBlockedUsers from '../actions/userActions/getBlockedUsers';
+import unblockUser from '../actions/userActions/unBlockUser';
+import removeFriend from '../actions/userActions/removeFriend';
+import unreadMessageCount from '../actions/messagesAction/unreadmessageCount';
 // You can use the `--esModuleInterop` compiler option in your `tsconfig.json` file to avoid the need for explicit file extensions.
 const router = Router();
 
@@ -50,23 +58,32 @@ router.post('/singleFileUpload', upload.single("singleFile"), singleFileUpload)
 // user management
 router.patch('/update-profile', authenticateToken, update_profile)
 router.patch("/update-privacy", authenticateToken, updatePrivacy)
-
+router.get('/block/:recieverId', authenticateToken, blockUser)
+router.get("/block-users", authenticateToken, getBlockedUsers)
+router.delete('/un-block-user/:recieverId', authenticateToken, unblockUser)
 //users
 router.get('/users', authenticateToken, getUsers)
 router.get('/my-friends', authenticateToken, getMyFriends)
 router.get("/friends", authenticateToken, getFriends)
 router.get('/participant-profile/:userId', authenticateToken, getParticipantProfile)
+router.get('/users-profile/:userId', authenticateToken, getUsersProfile)
 // friend request
 router.get('/friend-requests', authenticateToken,  getFriendsRequest)
 router.post("/confirmFriendRequest", authenticateToken, acceptFriendRequest)
 router.get('/send-friend-request/:receiverId', authenticateToken, sendFriendRequest)
+router.delete('/remove-friend/:receiverId', authenticateToken, removeFriend)
+
 //conversations
 router.get('/conversations', authenticateToken, getConversations)
 router.get('/convo-details/:conversationId', authenticateToken, getConvoDetails)
 router.get('/messages/:conversationId', authenticateToken, getMessages)
 router.get('/read-message/:conversationId', authenticateToken, readMessage)
+router.get('/message-count', authenticateToken, unreadMessageCount)
 //group
 router.post('/createNewGroup', authenticateToken, createNewGroup)
 router.post("/update-group-settings/:groupId", authenticateToken, updateGroupSetting)
 router.get('/group-profile/:groupId', authenticateToken, getGroupDetails)
+router.post('/add-participant/:groupId', authenticateToken, addParticipant)
+router.delete("remove-participant/:groupId", authenticateToken, removeParticipant)
+
 export default router;

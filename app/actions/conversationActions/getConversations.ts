@@ -50,6 +50,7 @@ where: {
     },
   ],
 },
+
       include: {
         group:true,
         unreadStates: {
@@ -80,6 +81,8 @@ where: {
         },
       },
     }),
+
+    
 
 
     prisma.conversation.count({
