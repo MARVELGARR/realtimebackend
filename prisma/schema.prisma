@@ -244,7 +244,7 @@ model Friendship  {
   updatedAt    DateTime @default(now())
 
   
-
+   @@unique([user1Id, user2Id])
   
 }
 
