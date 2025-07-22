@@ -18,7 +18,7 @@ export const authConfig = {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackUrl: process.env.NODE_ENV === 'production' 
       ? process.env.GOOGLE_CALLBACK_URL
-      : 'http://localhost:8080/api/v1/auth/callback/google',
+      : 'https://realtimebackend.onrender.com/api/v1/auth/callback/google',
     scopes: [...scopes],
     authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     tokenUrl: 'https://oauth2.googleapis.com/token',
