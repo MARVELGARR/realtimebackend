@@ -54,5 +54,5 @@ const updatePrivacy: RequestHandler = async (req: Request, res: Response) => {
   res.status(200).json(data);
   return;
 };
-
+//
 export default updatePrivacy;
