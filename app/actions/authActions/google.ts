@@ -131,7 +131,7 @@ export const googleCallback = async (
       res.cookie('sessionID', sessionId, {
         httpOnly: true,
         secure: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000, 
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
