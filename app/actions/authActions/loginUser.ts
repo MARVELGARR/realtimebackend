@@ -99,7 +99,7 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
       res.status(200).json({
   message: "Login successful",
   user: ResponseUser,
-  redirectTo: '/Application/chat'
+  redirectTo: '/'
 });
       
         return
