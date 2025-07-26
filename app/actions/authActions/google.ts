@@ -137,7 +137,7 @@ export const googleCallback = async (
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
 
-     res.redirect(`/`);
+     res.redirect(`${process.env.FRONTEND_URL}/Application/chat`);
       
     } else {
       console.error("Failed to exchange authorization code");
