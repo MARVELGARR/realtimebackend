@@ -16,14 +16,24 @@ const removeFriend: RequestHandler = async (req: Request, res: Response) => {
 
     
     try {
+        // First, find the friendship by user1Id and user2Id
+        const friendship = await prisma.friendship.findFirst({
+            where: {
+                user1Id: user?.userId,
+                user2Id: receiverId
+            }
+        });
+
+        if (!friendship) {
+            res.status(404).json({ message: "Friendship not found" });
+            return;
+        }
+
         const removeFriend = await prisma.friendship.delete({
             where: {
-                user1Id_user2Id: {
-                    user1Id: user?.userId,
-                    user2Id: receiverId
-                }
+                id: friendship.id
             }
-        })
+        });
         res.status(200).json(removeFriend)
         return 
     } catch (error) {
@@ -32,7 +42,7 @@ const removeFriend: RequestHandler = async (req: Request, res: Response) => {
         return;
     }
     
-  return;
+
 };
 
 export default removeFriend;

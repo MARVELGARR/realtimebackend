@@ -96,7 +96,11 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         });
 
-      
+      res.status(200).json({
+  message: "Login successful",
+  user: ResponseUser,
+  redirectTo: '/Application/chat'
+});
       
         return
 

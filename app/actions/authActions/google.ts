@@ -137,7 +137,11 @@ export const googleCallback = async (
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
 
-     
+     res.status(200).json({
+  message: "Login successful",
+ 
+  redirectTo: '/Application/chat'
+});
      return
       
     } else {
