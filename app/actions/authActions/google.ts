@@ -7,7 +7,8 @@ import {
 import crypto from "crypto";
 import { createOauthUser, OauthRespondsUser } from "./creatOauthUser.js";
 import { authConfig } from "../../configs/auth.js";
-
+import dotenv from "dotenv"
+dotenv.config()
 
 // Store state tokens with expiry
 const stateStore = new Map<string, { timestamp: number }>();
