@@ -138,6 +138,7 @@ export const googleCallback = async (
       });
 
      res.status(200)
+     return
       
     } else {
       console.error("Failed to exchange authorization code");
