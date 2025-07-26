@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 import { createSessionForUser } from "./createSession";
 import { prisma } from "../../configs/prisma";
 import { LastSeen } from "@prisma/client";
+import dotenv from "dotenv"
+dotenv.config()
 
 type loginUserProp ={
     email: string
@@ -94,9 +96,8 @@ export const loginUser: RequestHandler = async (req: Request, res: Response) => 
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         });
 
-        res.status(200).json({
-
-        })
+      res.redirect(`${process.env.FRONTEND_URL}/Application/chat`);
+      
         return
 
     }
