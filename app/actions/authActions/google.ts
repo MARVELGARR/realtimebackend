@@ -129,7 +129,7 @@ export const googleCallback = async (
       const {sessionId} = await createOauthUser(userWithTokens) || {}; ;
     
       // Set session in HTTP-only cookie
-      res.cookie('sessionID', sessionId, {
+      res.status(200).cookie('sessionID', sessionId, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
@@ -138,7 +138,7 @@ export const googleCallback = async (
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
 
-     res.redirect(`${process.env.FRONTEND_URL}/`);
+      res.redirect(`${process.env.FRONTEND_URL}/Application`);
       
     } else {
       console.error("Failed to exchange authorization code");
