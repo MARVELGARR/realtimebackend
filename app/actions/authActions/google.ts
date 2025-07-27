@@ -131,7 +131,7 @@ export const googleCallback = async (
       // Set session in HTTP-only cookie
       res.status(200).cookie('sessionID', sessionId, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: 'none',
         
         maxAge: 24 * 60 * 60 * 1000, 
