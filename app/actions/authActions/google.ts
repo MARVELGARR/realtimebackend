@@ -7,8 +7,7 @@ import {
 import crypto from "crypto";
 import { createOauthUser, OauthRespondsUser } from "./creatOauthUser.js";
 import { authConfig } from "../../configs/auth.js";
-import dotenv from "dotenv"
-dotenv.config()
+
 
 // Store state tokens with expiry
 const stateStore = new Map<string, { timestamp: number }>();
@@ -129,17 +128,15 @@ export const googleCallback = async (
       const {sessionId} = await createOauthUser(userWithTokens) || {}; ;
     
       // Set session in HTTP-only cookie
-      res.status(200).cookie('sessionID', sessionId, {
+      res.cookie('sessionID', sessionId, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: 'none',
-        
         maxAge: 24 * 60 * 60 * 1000, 
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
 
-      res.redirect(`${process.env.FRONTEND_URL}/Application/chat`);
-      
+     res.status(200).json({ message: "Login successful", redirectTo: "/Application/chat" });
     } else {
       console.error("Failed to exchange authorization code");
       throw new Error("Failed to exchange authorization code");
