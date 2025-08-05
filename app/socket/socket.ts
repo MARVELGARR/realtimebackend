@@ -59,19 +59,34 @@ export type sendMessageProp = {
   newMessage: GroupMessageProp;
 };
 
+const HEARTBEAT_TIMEOUT = 30000;
+
 export function initializeSocket(server: any) {
-  io = new Server(server, { cors: corsOptions });
+  io = new Server(server, {
+    cors: corsOptions,
+    pingInterval: 10000,
+    pingTimeout: 25000,
+  });
 
-  const onlineUsers = new Map<string, string>();
+  const onlineUsers = new Map<string, { socketId: string; lastSeen: number }>();
+
   io.on("connection", (socket) => {
+    console.log(`🔌 New socket connected: ${socket.id}`);
+
     socket.on("user-connected", (userId: string) => {
-      onlineUsers.set(socket.id, userId);
+      onlineUsers.set(userId, { socketId: socket.id, lastSeen: Date.now() });
 
-      //Informs the loggedin user he/she is online
+      // Notify just this socket
       socket.emit("isOnline", { isOnline: true });
-      const onlineUserIds = Array.from(onlineUsers.values());
 
-      io.emit("online-users", onlineUserIds);
+      // Notify all sockets
+      io.emit("online-users", Array.from(onlineUsers.keys()));
+    });
+
+    socket.on("heartbeat", (userId: string) => {
+      if (onlineUsers.has(userId)) {
+        onlineUsers.set(userId, { socketId: socket.id, lastSeen: Date.now() });
+      }
     });
 
     socket.on("join-conversation", (conversationId: string) => {
@@ -79,18 +94,44 @@ export function initializeSocket(server: any) {
       console.log(`User ${socket.id} joined conversation ${conversationId}`);
     });
 
-
-    sendMessageHandler(socket, io)
-    SocketDeleteSingleMessage(socket, io)
-    deleteMultipleMessageSocket(socket, io)
+    sendMessageHandler(socket, io);
+    SocketDeleteSingleMessage(socket, io);
+    deleteMultipleMessageSocket(socket, io);
 
     socket.onAny((event, ...args) => {
       console.log(`📩 Event received: ${event}`, args);
     });
 
-    socket.on("disconnect", () => { 
-      onlineUsers.delete(socket.id);
-      io.emit("online-users", Array.from(onlineUsers.values()));
+    socket.on("disconnect", () => {
+      // Find and remove user by socketId
+      const disconnectedUser = [...onlineUsers.entries()].find(
+        ([, value]) => value.socketId === socket.id
+      );
+
+      if (disconnectedUser) {
+        onlineUsers.delete(disconnectedUser[0]);
+        io.emit("online-users", Array.from(onlineUsers.keys()));
+        console.log(`❌ User ${disconnectedUser[0]} disconnected`);
+      }
     });
   });
+
+  // Cleanup inactive users every 10s
+  setInterval(() => {
+    const now = Date.now();
+    let changed = false;
+
+    for (const [userId, { lastSeen }] of onlineUsers.entries()) {
+      if (now - lastSeen > HEARTBEAT_TIMEOUT) {
+        console.log(`⚠️ Removing inactive user: ${userId}`);
+        onlineUsers.delete(userId);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      io.emit("online-users", Array.from(onlineUsers.keys()));
+    }
+  }, 10000); // every 10s
 }
+
