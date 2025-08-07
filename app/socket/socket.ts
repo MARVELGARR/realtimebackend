@@ -88,6 +88,10 @@ export function initializeSocket(server: any) {
         onlineUsers.set(userId, { socketId: socket.id, lastSeen: Date.now() });
       }
     });
+    socket.on("check-my-status", (userId: string) => {
+  const isStillOnline = onlineUsers.has(userId);
+  socket.emit("isOnline", { isOnline: isStillOnline });
+});
 
     socket.on("join-conversation", (conversationId: string) => {
       socket.join(conversationId);
